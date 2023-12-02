@@ -9,6 +9,14 @@ import cv2
 from torch.utils.data import Dataset, DataLoader
 import torch
 
+from ultralytics import YOLO
+# import cv2
+
+# model = YOLO('yolov8s.pt')  # load a pretrained model (recommended for training)
+
+
+# results = model.predict(source="1", show=True)
+
 # Load the YOLOv8 model
 net = cv2.dnn.readNet("yolov8.weights", "yolov8.cfg")
 
