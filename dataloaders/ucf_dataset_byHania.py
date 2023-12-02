@@ -82,39 +82,39 @@ class CenterCrop(object):
 
     #     return new_buffer
 
-def __call__(self, buffer):
-    h, w = buffer.shape[1], buffer.shape[2]
-    new_h, new_w = self.output_size
+    def __call__(self, buffer):
+        h, w = buffer.shape[1], buffer.shape[2]
+        new_h, new_w = self.output_size
 
-    top = int(round(h - new_h) / 2.)
-    left = int(round(w - new_w) / 2.)
+        top = int(round(h - new_h) / 2.)
+        left = int(round(w - new_w) / 2.)
 
-    new_buffer = np.zeros((buffer.shape[0], new_h, new_w, 3))
-    for i in range(buffer.shape[0]):
-        image = buffer[i, :, :, :]
-        image = image[top: top + new_h, left: left + new_w]
-        new_buffer[i, :, :, :] = image
+        new_buffer = np.zeros((buffer.shape[0], new_h, new_w, 3))
+        for i in range(buffer.shape[0]):
+            image = buffer[i, :, :, :]
+            image = image[top: top + new_h, left: left + new_w]
+            new_buffer[i, :, :, :] = image
 
-    # Insert the object detection and bounding box creation code here
-    new_buffer = self.process_buffer_with_yolo(new_buffer, top, left, new_h, new_w)
+        # Insert the object detection and bounding box creation code here
+        new_buffer = self.process_buffer_with_yolo(new_buffer, top, left, new_h, new_w)
 
-    return new_buffer
+        return new_buffer
 
-def process_buffer_with_yolo(self, buffer, top, left, new_h, new_w):
-    new_buffer = np.zeros((buffer.shape[0], new_h, new_w, 3))
-    for i in range(buffer.shape[0]):
-        image = buffer[i, :, :, :]
-        image = image[top: top + new_h, left: left + new_w]
-        results = self.model.predict(image)
-        for box in results.boxes:
-            cords = box.xyxy[0].tolist()
-            class_id = box.cls[0].item()
-            start = (int(cords[0]), int(cords[1]))  # x0, y0
-            end = (int(cords[2]), int(cords[3]))  # x1, y1
-            cv2.rectangle(image, start, end, (0, 200, 0), thickness=2)
-            cv2.putText(image, results.names[class_id], (start[0] + 15, start[1] + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (10, 0, 10), 2)
-        new_buffer[i, :, :, :] = image
-    return new_buffer
+    def process_buffer_with_yolo(self, buffer, top, left, new_h, new_w):
+        new_buffer = np.zeros((buffer.shape[0], new_h, new_w, 3))
+        for i in range(buffer.shape[0]):
+            image = buffer[i, :, :, :]
+            image = image[top: top + new_h, left: left + new_w]
+            results = self.model.predict(image)
+            for box in results.boxes:
+                cords = box.xyxy[0].tolist()
+                class_id = box.cls[0].item()
+                start = (int(cords[0]), int(cords[1]))  # x0, y0
+                end = (int(cords[2]), int(cords[3]))  # x1, y1
+                cv2.rectangle(image, start, end, (0, 200, 0), thickness=2)
+                cv2.putText(image, results.names[class_id], (start[0] + 15, start[1] + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (10, 0, 10), 2)
+            new_buffer[i, :, :, :] = image
+        return new_buffer
 
 
 class RandomHorizontalFlip(object):
@@ -217,10 +217,15 @@ class UCFDataset(Dataset):
             image_name = 'image_' + s + '.jpg'
             image_path = os.path.join(video_jpgs_path, image_name)
             tmp_image = cv2.imread(image_path)
-            tmp_image = cv2.resize(tmp_image, (self.resize_width, self.resize_height))
-            tmp_image = np.array(tmp_image).astype(np.float64)
-            tmp_image = tmp_image[:, :, ::-1]    # BGR -> RGB
-            video_x[i, :, :, :] = tmp_image
+            
+            
+            if tmp_image is not None:
+                tmp_image = cv2.resize(tmp_image, (self.resize_width, self.resize_height))
+                tmp_image = np.array(tmp_image).astype(np.float64)
+                tmp_image = tmp_image[:, :, ::-1]    # BGR -> RGB
+                video_x[i, :, :, :] = tmp_image
+            else:
+                print(f"Cannot read image file at {image_path}")
 
         return video_x
 
