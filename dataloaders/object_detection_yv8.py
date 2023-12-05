@@ -5,6 +5,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
+from ucf_dataset import UCFDataset
+
 warnings.filterwarnings('ignore')
 
 # Load the preprocessed dataset
