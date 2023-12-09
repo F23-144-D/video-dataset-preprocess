@@ -1,0 +1,13 @@
+
+path: F:\GitHub\video-dataset-preprocess\Dataset\UCF-101 # dataset root dir
+train: F:\GitHub\video-dataset-preprocess\Dataset\UCF-TrainTestVal\train_video_files.txt
+val: F:\GitHub\video-dataset-preprocess\Dataset\UCF-TrainTestVal\val_video_files.txt
+test: F:\GitHub\video-dataset-preprocess\Dataset\UCF-TrainTestVal\test_video_files.txt
+
+# Keypoints
+kpt_shape: [17, 3]  # number of keypoints, number of dims (2 for x,y or 3 for x,y,visible)
+flip_idx: [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
+
+# Classes
+names:
+  0: person
