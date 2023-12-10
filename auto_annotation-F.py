@@ -1,4 +1,3 @@
-@ -1,71 +0,0 @@
 from PIL import Image
 from ultralytics import YOLO
 import cv2

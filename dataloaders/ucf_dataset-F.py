@@ -231,3 +231,6 @@ if __name__ == '__main__':
 
     for i_batch, (images, targets) in enumerate(test_dataloader):
         print(i_batch, images.size(), targets.size())
+
+
+        
