@@ -3,21 +3,21 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 # Directory containing the UCF101 dataset
-dataset_dir = './Dataset/UCF-101'
+dataset_dir = './Dataset/UCF101_n_frames'
 
 # Get a list of all video files
 video_files = [os.path.join(dirpath, filename)
                for dirpath, dirnames, filenames in os.walk(dataset_dir)
-               for filename in filenames if filename.endswith('.avi')]
+               for filename in filenames if filename.endswith('.jpg')]
 
 # Convert the list to a numpy array and sort it
 video_files = np.array(sorted(video_files))
 
-# Extract action folders from video file paths
+# Extract action folders from image file paths
 action_folders = [os.path.basename(os.path.dirname(file)) for file in video_files]
 
 # Directory to store the text files
-output_dir = './Dataset/UCF-TrainTestVal'
+output_dir = './UCF-TrainTestVal'
 
 # Get a list of all action folder names
 all_action_folders = sorted([f for f in os.listdir(dataset_dir) if os.path.isdir(os.path.join(dataset_dir, f))])
@@ -38,7 +38,7 @@ numbered_action_folders = [f"{i+1} {folder}" for i, folder in enumerate(action_f
 video_files_with_folders = [f"{folder}/{os.path.basename(file)}" for folder, file in zip(action_folders, video_files)]
 
 # Save the video file names with folders to a single text file
-all_video_files_path = os.path.join(output_dir, 'all_video_files.txt')
+all_video_files_path = os.path.join(output_dir, 'all_images.txt')
 np.savetxt(all_video_files_path, video_files_with_folders, fmt='%s')
 
 # Split the data into training and test sets
@@ -48,9 +48,9 @@ train_files, test_files = train_test_split(video_files_with_folders, test_size=0
 val_files, test_files = train_test_split(test_files, test_size=0.5, random_state=42)
 
 # Save the numbered video file names with folders to individual text files
-np.savetxt(os.path.join(output_dir, 'train_video_files.txt'), train_files, fmt='%s')
-np.savetxt(os.path.join(output_dir, 'val_video_files.txt'), val_files, fmt='%s')
-np.savetxt(os.path.join(output_dir, 'test_video_files.txt'), test_files, fmt='%s')
+np.savetxt(os.path.join(output_dir, 'train.txt'), train_files, fmt='%s')
+np.savetxt(os.path.join(output_dir, 'val.txt'), val_files, fmt='%s')
+np.savetxt(os.path.join(output_dir, 'test.txt'), test_files, fmt='%s')
 
 # Calculate the percentages
 total_files = len(video_files_with_folders)
@@ -62,7 +62,3 @@ train_percentage = len(train_files) / total_files * 100
 print(f"Test set percentage: {test_percentage}%")
 print(f"Validation set percentage: {val_percentage}%")
 print(f"Training set percentage: {train_percentage}%")
-
-
-
-
