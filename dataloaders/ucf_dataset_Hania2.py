@@ -9,9 +9,6 @@ import cv2
 from torch.utils.data import Dataset, DataLoader
 import torch
 
-# Load the YOLOv8 model
-net = cv2.dnn.readNet("yolov8.weights", "yolov8.cfg")
-
 
 class ClipSubstractMean(object):
     def __init__(self, b=104, g=117, r=123):
@@ -70,54 +67,20 @@ class CenterCrop(object):
             assert len(output_size) == 2
             self.output_size = output_size
 
-    # def __call__(self, buffer):
-    #     h, w = buffer.shape[1], buffer.shape[2]
-    #     new_h, new_w = self.output_size
+    def __call__(self, buffer):
+        h, w = buffer.shape[1], buffer.shape[2]
+        new_h, new_w = self.output_size
 
-    #     top = int(round(h - new_h) / 2.)
-    #     left = int(round(w - new_w) / 2.)
+        top = int(round(h - new_h) / 2.)
+        left = int(round(w - new_w) / 2.)
 
-    #     new_buffer = np.zeros((buffer.shape[0], new_h, new_w, 3))
-    #     for i in range(buffer.shape[0]):
-    #         image = buffer[i, :, :, :]
-    #         image = image[top: top + new_h, left: left + new_w]
-    #         new_buffer[i, :, :, :] = image
+        new_buffer = np.zeros((buffer.shape[0], new_h, new_w, 3))
+        for i in range(buffer.shape[0]):
+            image = buffer[i, :, :, :]
+            image = image[top: top + new_h, left: left + new_w]
+            new_buffer[i, :, :, :] = image
 
-    #     return new_buffer
-
-def __call__(self, buffer):
-    h, w = buffer.shape[1], buffer.shape[2]
-    new_h, new_w = self.output_size
-
-    top = int(round(h - new_h) / 2.)
-    left = int(round(w - new_w) / 2.)
-
-    new_buffer = np.zeros((buffer.shape[0], new_h, new_w, 3))
-    for i in range(buffer.shape[0]):
-        image = buffer[i, :, :, :]
-        image = image[top: top + new_h, left: left + new_w]
-        new_buffer[i, :, :, :] = image
-
-    # Insert the object detection and bounding box creation code here
-    new_buffer = self.process_buffer_with_yolo(new_buffer, top, left, new_h, new_w)
-
-    return new_buffer
-
-def process_buffer_with_yolo(self, buffer, top, left, new_h, new_w):
-    new_buffer = np.zeros((buffer.shape[0], new_h, new_w, 3))
-    for i in range(buffer.shape[0]):
-        image = buffer[i, :, :, :]
-        image = image[top: top + new_h, left: left + new_w]
-        results = self.model.predict(image)
-        for box in results.boxes:
-            cords = box.xyxy[0].tolist()
-            class_id = box.cls[0].item()
-            start = (int(cords[0]), int(cords[1]))  # x0, y0
-            end = (int(cords[2]), int(cords[3]))  # x1, y1
-            cv2.rectangle(image, start, end, (0, 200, 0), thickness=2)
-            cv2.putText(image, results.names[class_id], (start[0] + 15, start[1] + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (10, 0, 10), 2)
-        new_buffer[i, :, :, :] = image
-    return new_buffer
+        return new_buffer
 
 
 class RandomHorizontalFlip(object):
@@ -161,7 +124,7 @@ class UCFDataset(Dataset):
 
     """
 
-    def __init__(self, root_dir, info_list, split='train', clip_len=16):
+    def __init__(self, root_dir, info_list, split='train', clip_len=16, save_dir=None):
         self.root_dir = root_dir
         self.clip_len = clip_len
         self.landmarks_frame = pd.read_csv(info_list, delimiter=' ', header=None)
@@ -187,9 +150,31 @@ class UCFDataset(Dataset):
         self.resize_width = 171
         self.crop_size = 112
 
+    
+        self.save_dir = save_dir
+        print(save_dir)
+        if self.save_dir is not None:
+            os.makedirs(self.save_dir, exist_ok=True)
+
     def __len__(self):
         return len(self.landmarks_frame)
 
+    # Normalize pixel values between 0 and 1
+    def normalize(images):
+        return images / 255.0
+
+    # One-hot encode labels
+    def one_hot_encode(labels, num_classes):
+        labels_one_hot = torch.zeros(len(labels), num_classes)
+        for i, label in enumerate(labels):
+            labels_one_hot[i, label] = 1.0
+        return labels_one_hot
+
+    # Pack multiple frames into a single tensor
+    def pack_frames(frames):
+        frames = torch.stack(frames, dim=0)
+        return frames.view(-1, frames.size(2), frames.size(3), frames.size(4))
+    
     def __getitem__(self, index):
         # Loading and preprocessing.
         video_path = self.landmarks_frame.iloc[index, 0]
@@ -199,37 +184,72 @@ class UCFDataset(Dataset):
         else:
             classes = video_path.split('/')[0]
             labels = int(self.label_class_map[classes]) - 1
-        buffer = self.get_resized_frames_per_video(video_path)
+            # Normalize pixel values
+            buffer = normalize(buffer)
 
-        if self.transform:
-            buffer = self.transform(buffer)
+            # One-hot encode labels
+            labels = one_hot_encode(labels, 101)  # assuming 101 classes for UCF101
 
-        return buffer, torch.from_numpy(np.array(labels))
+            # Pack frames (if clip_len > 1)
+            if self.clip_len > 1:
+                buffer = pack_frames(buffer)
+
+        return buffer, labels
 
     def get_resized_frames_per_video(self, video_path):
         slash_rows = video_path.split('.')
         dir_name = slash_rows[0]
         video_jpgs_path = os.path.join(self.root_dir, dir_name)
-        # get the random continuous 16 frame
+
+        # Read the number of frames from the n_frames file
         data = pd.read_csv(os.path.join(video_jpgs_path, 'n_frames'), delimiter=' ', header=None)
         frame_count = data[0][0]
+
+        # Initialize an array to store all frames
         video_x = np.empty((self.clip_len, self.resize_height, self.resize_width, 3), np.dtype('float32'))
-        image_start = random.randint(1, abs(frame_count - self.clip_len))
+
         for i in range(self.clip_len):
-            s = "%05d" % (i + image_start)
+            # Compute the frame number based on the clip length
+            frame_number = (i * frame_count) // self.clip_len + 1
+
+            # Generate the image filename based on the frame number
+            s = "%05d" % frame_number
             image_name = 'image_' + s + '.jpg'
             image_path = os.path.join(video_jpgs_path, image_name)
-            tmp_image = cv2.imread(image_path)
-            tmp_image = cv2.resize(tmp_image, (self.resize_width, self.resize_height))
-            tmp_image = np.array(tmp_image).astype(np.float64)
-            tmp_image = tmp_image[:, :, ::-1]    # BGR -> RGB
-            video_x[i, :, :, :] = tmp_image
+
+            if os.path.exists(image_path):
+                # Read and resize the image
+                tmp_image = cv2.imread(image_path)
+                tmp_image = cv2.resize(tmp_image, (self.resize_width, self.resize_height))
+                tmp_image = np.array(tmp_image).astype(np.float64)
+                tmp_image = tmp_image[:, :, ::-1]  # BGR -> RGB
+
+                # Store the frame in the array
+                video_x[i, :, :, :] = tmp_image
+            
+            # if self.save_dir is not None:
+            #     # Save the preprocessed frame to the new directory
+            #     print(self.save_dir, "...................is save dir")
+            #     save_image_path = os.path.join(self.save_dir, dir_name, f'image_{i:05d}.jpg')
+            #     cv2.imwrite(save_image_path, tmp_image)
+            if self.save_dir is not None:
+                # Save the preprocessed frame to the new directory
+                save_subdir = os.path.join(self.save_dir, dir_name)
+                os.makedirs(save_subdir, exist_ok=True)  # Create the subdirectory if it doesn't exist
+                save_image_path = os.path.join(save_subdir, f'image_{i:05d}.jpg')
+                cv2.imwrite(save_image_path, tmp_image)
+
+
 
         return video_x
+    
+    
+
+
 
 
 if __name__ == '__main__':
-    # usage
+
     root_list = './Dataset/UCF101_n_frames/'
     info_list = './Dataset/ucfTrainTestlist/testlist01.txt'
 
@@ -242,13 +262,17 @@ if __name__ == '__main__':
     #                               ToTensor()]))
 
     # dataloader = DataLoader(trainUCF101, batch_size=8, shuffle=True, num_workers=0)
-    test_dataloader = DataLoader(UCFDataset(root_dir='./Dataset/UCF101_n_frames',
-                                              info_list='./Dataset/ucfTrainTestlist/testlist01.txt',
-                                              split='test',
-                                              clip_len=16),
-                                 batch_size=8, shuffle=True,num_workers=0)
+    save_directory = './Dataset/UCF-preprocessed'
+    test_dataloader = DataLoader(
+        UCFDataset(root_dir='./Dataset/UCF101_n_frames',
+                info_list='./Dataset/ucfTrainTestlist/testlist01.txt',
+                split='test',
+                clip_len=16,
+                save_dir=save_directory),
+        batch_size=8, shuffle=True, num_workers=0
+    )
+    
+    torch.save(test_dataloader, 'processed_dataset.pth')
 
     for i_batch, (images, targets) in enumerate(test_dataloader):
         print(i_batch, images.size(), targets.size())
-
-        
