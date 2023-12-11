@@ -1,6 +1,6 @@
-/Dataset
+# /Dataset
 
-/Action
+# /Action
 
 /objdetect
 /path_to_output_directory
@@ -12,3 +12,4 @@
 /train-data/train
 /train-data/val
 /train-data/ucfTrainTestlist
+/train-data-sample
