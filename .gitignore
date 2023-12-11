@@ -1,4 +1,14 @@
 /Dataset
 
 /Action
+
+/objdetect
+/path_to_output_directory
+/Pose-detetction
+/roi-data
 /runs
+/train-data/runs
+/train-data/test
+/train-data/train
+/train-data/val
+/train-data/ucfTrainTestlist
