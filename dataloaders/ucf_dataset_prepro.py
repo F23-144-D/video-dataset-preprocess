@@ -1,5 +1,3 @@
-
-
 import os
 import pandas as pd
 import numpy as np
@@ -82,7 +80,20 @@ class CenterCrop(object):
 
         return new_buffer
 
+# class RandomHorizontalFlip(object):
+#     """Horizontally flip the given Images randomly with a given probability.
 
+#     Args:
+#         p (float): probability of the image being flipped. Default value is 0.5
+#     """
+
+#     def __call__(self, buffer):
+#         if random.random() < self.p:
+#             buffer = np.flip(buffer, axis=2)
+#             print("Flipping Image")
+#         return buffer
+    
+    
 class RandomHorizontalFlip(object):
     """Horizontally flip the given Images randomly with a given probability.
 
@@ -95,8 +106,13 @@ class RandomHorizontalFlip(object):
             for i, frame in enumerate(buffer):
                 buffer[i] = cv2.flip(frame, flipCode=1)
 
-        return buffer
+                flip_dir = "./Dataset/UCF-preprocessed"  # Update the folder path
+                flip_dir = flip_dir + "/" + "image_" + str(i) + ".jpg"
 
+                cv2.imwrite(flip_dir, buffer[i])
+                print(frame, " is flipped")
+
+        return buffer
 
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
@@ -109,13 +125,8 @@ class ToTensor(object):
 
         return img.float().div(255)
 
-from sklearn.utils.class_weight import compute_class_weight
-import cv2
-import numpy as np
-from torch.utils.data import DataLoader
 
 class UCFDataset(Dataset):
-    # ... (existing code)
     r"""A Dataset for a folder of videos. Expects the directory structure to be
     directory->[train/val/test]->[class labels]->[videos]. Initializes with a list
     of all file names, along with an array of labels, with label being automatically
@@ -129,7 +140,7 @@ class UCFDataset(Dataset):
 
     """
 
-    def __init__(self, root_dir, info_list, split='train', clip_len=16):
+    def __init__(self, root_dir, info_list, clip_len=16, save_dir=None):
         self.root_dir = root_dir
         self.clip_len = clip_len
         self.landmarks_frame = pd.read_csv(info_list, delimiter=' ', header=None)
@@ -138,22 +149,21 @@ class UCFDataset(Dataset):
             for line in f:
                 line=line.strip('\n').split(' ')
                 self.label_class_map[line[1]] = line[0]
-        self.split = split
-        if split == 'train':
-            self.transform = transforms.Compose(
-                [ClipSubstractMean(),
-                 RandomCrop(),
-                 RandomHorizontalFlip(),
-                 ToTensor()])
-        else:
-            self.transform = transforms.Compose(
-                [ClipSubstractMean(),
-                 CenterCrop(),
-                 ToTensor()])
+        self.transform = transforms.Compose(
+            [ClipSubstractMean(),
+                RandomCrop(),
+                RandomHorizontalFlip(),
+                ToTensor()])
         # The following three parameters are chosen as described in the paper section 4.1
         self.resize_height = 128
         self.resize_width = 171
         self.crop_size = 112
+
+    
+        self.save_dir = save_dir
+        print(save_dir)
+        if self.save_dir is not None:
+            os.makedirs(self.save_dir, exist_ok=True)
 
     def __len__(self):
         return len(self.landmarks_frame)
@@ -178,114 +188,79 @@ class UCFDataset(Dataset):
         slash_rows = video_path.split('.')
         dir_name = slash_rows[0]
         video_jpgs_path = os.path.join(self.root_dir, dir_name)
-        # get the random continuous 16 frame
+
+        # Read the number of frames from the n_frames file
         data = pd.read_csv(os.path.join(video_jpgs_path, 'n_frames'), delimiter=' ', header=None)
         frame_count = data[0][0]
+
+        # Initialize an array to store all frames
         video_x = np.empty((self.clip_len, self.resize_height, self.resize_width, 3), np.dtype('float32'))
-        image_start = random.randint(1, abs(frame_count - self.clip_len))
+
         for i in range(self.clip_len):
-            s = "%05d" % (i + image_start)
+            # Compute the frame number based on the clip length
+            frame_number = (i * frame_count) // self.clip_len + 1
+
+            # Generate the image filename based on the frame number
+            s = "%05d" % frame_number
             image_name = 'image_' + s + '.jpg'
             image_path = os.path.join(video_jpgs_path, image_name)
-            tmp_image = cv2.imread(image_path)
-            tmp_image = cv2.resize(tmp_image, (self.resize_width, self.resize_height))
-            tmp_image = np.array(tmp_image).astype(np.float64)
-            tmp_image = tmp_image[:, :, ::-1]    # BGR -> RGB
-            video_x[i, :, :, :] = tmp_image
+
+            if os.path.exists(image_path):
+                # Read and resize the image
+                tmp_image = cv2.imread(image_path)
+                tmp_image = cv2.resize(tmp_image, (self.resize_width, self.resize_height))
+                tmp_image = np.array(tmp_image).astype(np.float64)
+                tmp_image = tmp_image[:, :, ::-1]  # BGR -> RGB
+
+                # Store the frame in the array
+                video_x[i, :, :, :] = tmp_image
+            
+            if self.save_dir is not None:
+                # Save the preprocessed frame to the new directory
+                save_image_path = os.path.join(self.save_dir, dir_name)
+                
+                # Ensure the directory exists, create if necessary
+                os.makedirs(save_image_path, exist_ok=True)
+                
+                # Append the file name to the directory path
+                save_image_path = os.path.join(save_image_path, f'image_{i:05d}.jpg')
+
+                
+                print(save_image_path, "saved")
+                print(tmp_image.shape)
+                cv2.imwrite(save_image_path, tmp_image)
 
         return video_x
     
     
-    #gpt
-    # def remove_duplicate_frames(self):
-        # Implement a function to remove duplicate frames based on content similarity
-        # ...
 
-    def remove_duplicate_frames(self, video_path):
-        # Load video frames
-        cap = cv2.VideoCapture(video_path)
-        frames = []
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            frames.append(frame)
-        cap.release()
 
-        # Calculate frame similarities
-        similarities = []
-        for i in range(len(frames)):
-            frame1 = cv2.cvtColor(frames[i], cv2.COLOR_BGR2GRAY)
-            for j in range(i + 1, len(frames)):
-                frame2 = cv2.cvtColor(frames[j], cv2.COLOR_BGR2GRAY)
-                similarity = cv2.matchTemplate(frame1, frame2, cv2.TM_CCOEFF_NORMED)
-                similarities.append(similarity)
 
-        # Find duplicate frames
-        duplicate_indices = []
-        threshold = 0.9  # Adjust the threshold as needed
-        for i in range(len(similarities)):
-            if similarities[i] >= threshold:
-                duplicate_indices.append(i)
-
-        # Remove duplicate frames
-        deduplicated_frames = [frames[i] for i in range(len(frames)) if i not in duplicate_indices]
-
-        return deduplicated_frames
-        
-
-    def data_loading_optimization(self):
-        # Implement prefetching and parallel processing in the DataLoader
-        dataloader = DataLoader(self, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, pin_memory=self.pin_memory)
-        return dataloader
-    
-    def handle_imbalanced_data(self):
-        # Check class distribution and implement class weighting if needed
-        class_counts = np.zeros(len(self.label_class_map))
-
-        for index in range(len(self.landmarks_frame)):
-            classes = self.landmarks_frame.iloc[index, 0].split('/')[0]
-            label = int(self.label_class_map[classes]) - 1
-            class_counts[label] += 1
-
-        class_weights = compute_class_weight('balanced', np.unique(self.landmarks_frame.iloc[:, 1]), self.landmarks_frame.iloc[:, 1])
-        class_weights = torch.FloatTensor(class_weights)
-        
-        return class_weights
-
-    def quality_control(self, num_samples=5):
-        # Implement a function to visualize a random sample of annotated frames for quality control
-        selected_indices = np.random.choice(len(self.landmarks_frame), num_samples, replace=False)
-
-        for index in selected_indices:
-            video_path = self.landmarks_frame.iloc[index, 0]
-            labels = int(self.landmarks_frame.iloc[index, 1]) - 1
-            buffer = self.get_resized_frames_per_video(video_path)
-
-            # Visualize frames or perform other quality control checks
-            # Example: Display frames using matplotlib or other visualization libraries
-            # ...
 
 if __name__ == '__main__':
-    # ... (existing code)
+    # usage
+    root_list = './Dataset/UCF101_n_frames/'
+    info_list = './Dataset/ucfTrainTestlist/all_videos.txt'
 
-    # Create an instance of UCFDataset
-    ucf_dataset = UCFDataset(root_dir='./Dataset/UCF101_n_frames',
-                             info_list='./Dataset/ucfTrainTestlist/testlist01.txt',
-                             split='test',
-                             clip_len=16)
+    # trainUCF101 = UCFDataset(root_list, info_list,'test'
+    #                           )
+    # testUCF101 = UCFDataset(root_list, info_list,
+    #                          transform=transforms.Compose(
+    #                              [ClipSubstractMean(),
+    #                               CenterCrop(),
+    #                               ToTensor()]))
 
-    # Perform data preprocessing steps
-    ucf_dataset.remove_duplicate_frames()
-    ucf_dataset.split_dataset()
-    ucf_dataset.data_loading_optimization()
-    class_weights = ucf_dataset.handle_imbalanced_data()
-    ucf_dataset.quality_control()
-
-    # Use class_weights in your loss function during training
-    criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
-
-    test_dataloader = DataLoader(ucf_dataset, batch_size=8, shuffle=True, num_workers=0)
+    # dataloader = DataLoader(trainUCF101, batch_size=8, shuffle=True, num_workers=0)
+    save_directory = './Dataset/UCF-preprocessed'
+    test_dataloader = DataLoader(
+        UCFDataset(root_dir=root_list,
+                info_list=info_list,
+                clip_len=16,
+                save_dir=save_directory),
+        batch_size=8, shuffle=True, num_workers=0
+    )
+    
+    torch.save(test_dataloader, 'processed_dataset.pth')
 
     for i_batch, (images, targets) in enumerate(test_dataloader):
         print(i_batch, images.size(), targets.size())
