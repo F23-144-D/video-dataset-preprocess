@@ -3,11 +3,12 @@ from ultralytics import YOLO
 import cv2
 import os
 
+
 # Load a pretrained YOLOv8n model
 model = YOLO('yolov8n-pose.pt')
 
 # Define the root directory
-root_dir = 'Dataset/UCF101_n_frames'
+root_dir = 'Dataset/UCF101_n_frames/ApplyEyeMakeup/v_ApplyEyeMakeup_g01_c01'
 
 # Walk through all files in the directory
 for dirpath, dirnames, filenames in os.walk(root_dir):
