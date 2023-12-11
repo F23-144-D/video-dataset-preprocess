@@ -32,9 +32,11 @@ hierarchy of UCF_obj_detected:
 import os
 import random
 import shutil
+import os
+import shutil
 # Define the paths
-train_dir = "/workspaces/video-dataset-preprocess/train-data"
-ucf_preprocessed_dir_img = "/workspaces/video-dataset-preprocess/Dataset/UCF-preprocessed"
+train_dir = "/workspaces/video-dataset-preprocess/train-data-sample"
+ucf_preprocessed_dir_img = "/workspaces/video-dataset-preprocess/Dataset/UCF-preprocessed-sample"
 ucf_obj_detected_dir_label = "/workspaces/video-dataset-preprocess/Dataset/UCF_obj_detected_sample"
 
 # Create train, test, and validation directories
@@ -45,6 +47,10 @@ val_data_dir = os.path.join(train_dir, "val")
 os.makedirs(train_data_dir, exist_ok=True)
 os.makedirs(test_data_dir, exist_ok=True)
 os.makedirs(val_data_dir, exist_ok=True)
+
+#%%
+#####################################################
+# images
 
 # Get the list of action names
 action_names = os.listdir(ucf_preprocessed_dir_img)
@@ -74,9 +80,9 @@ for action_name in action_names:
         val_files = image_files[num_train + num_test:]
 
         # Create the action directory in train, test, and validation directories
-        train_action_dir = os.path.join(train_data_dir, action_name)
-        test_action_dir = os.path.join(test_data_dir, action_name)
-        val_action_dir = os.path.join(val_data_dir, action_name)
+        train_action_dir = os.path.join(train_data_dir, action_name, "images")
+        test_action_dir = os.path.join(test_data_dir, action_name, "images")
+        val_action_dir = os.path.join(val_data_dir, action_name, "images")
 
         os.makedirs(train_action_dir, exist_ok=True)
         os.makedirs(test_action_dir, exist_ok=True)
@@ -98,6 +104,63 @@ for action_name in action_names:
             dst = os.path.join(val_action_dir, file)
             shutil.copy(src, dst)
 
+
+#%%
+#####################################################
+# labels
+
+# Assign actions to labels
+train_label_dir = os.path.join(train_dir, "train")
+test_label_dir = os.path.join(train_dir, "test")
+val_label_dir = os.path.join(train_dir, "val")
+
+os.makedirs(train_label_dir, exist_ok=True)
+os.makedirs(test_label_dir, exist_ok=True)
+os.makedirs(val_label_dir, exist_ok=True)
+
+for action_name in action_names:
+    action_label_dir = os.path.join(ucf_obj_detected_dir_label, action_name)
+    video_names = os.listdir(action_label_dir)
+
+    # Iterate over each video name
+    for video_name in video_names:
+        labels_dir = os.path.join(action_label_dir, video_name, "predict", "labels")
+        label_files = os.listdir(labels_dir)
+
+        # Split the label files into train, test, and validation sets
+        train_files = label_files[:num_train]
+        test_files = label_files[num_train:num_train + num_test]
+        val_files = label_files[num_train + num_test:]
+
+        # Create the action directory in train, test, and validation directories
+        train_action_dir = os.path.join(train_label_dir, action_name, "labels")
+        test_action_dir = os.path.join(test_label_dir, action_name, "labels")
+        val_action_dir = os.path.join(val_label_dir, action_name, "labels")
+
+        os.makedirs(train_action_dir, exist_ok=True)
+        os.makedirs(test_action_dir, exist_ok=True)
+        os.makedirs(val_action_dir, exist_ok=True)
+
+        # Copy the label files to the respective directories
+        for file in train_files:
+            src = os.path.join(labels_dir, file)
+            dst = os.path.join(train_action_dir, file)
+            shutil.copy(src, dst)
+
+        for file in test_files:
+            src = os.path.join(labels_dir, file)
+            dst = os.path.join(test_action_dir, file)
+            shutil.copy(src, dst)
+
+        for file in val_files:
+            src = os.path.join(labels_dir, file)
+            dst = os.path.join(val_action_dir, file)
+            shutil.copy(src, dst)
+
+# Print the success message
+print("Train-test splitting and label assignment completed successfully!")
+
+
 # Print the success message
 print("Train-test splitting completed successfully!")
 
@@ -113,7 +176,7 @@ print("Train-test splitting completed successfully!")
 # os.makedirs(train, exist_ok=True)
 # os.makedirs(test, exist_ok=True)
 # os.makedirs(val, exist_ok=True)
-
+"""
 # Keypoints
 kpt_shape: [17, 3]  # number of keypoints, number of dims (2 for x,y or 3 for x,y,visible)
 # flip_idx: [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
@@ -325,3 +388,5 @@ assign_actions_to_labels(action_names, val_data_dir)
 
 # Print the success message
 print("Actions assigned to labels successfully!")
+
+"""
