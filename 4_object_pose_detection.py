@@ -3,18 +3,18 @@ from ultralytics import YOLO
 import os
 import glob
 
-
 # Define the root directory
 root_dir = './Dataset'
-processed_data_dir = "/UCF-preprocessed"
-output_dir = "/UCF_obj_detected"
+processed_dir_name = "/UCF-preprocessed"
+output_dir_name = "/UCF_obj_detected"
 
+processed_dir = root_dir + processed_dir_name
 
 # Load a pretrained YOLOv8n model
 model = YOLO('yolov8n-pose.pt')
 
 # Walk through all files in the directory
-for dirpath, dirnames, filenames in os.walk(root_dir + processed_data_dir):
+for dirpath, dirnames, filenames in os.walk(processed_dir):
     
     print("dirpath: ", dirpath)
     print("dirnames: ", dirnames)
@@ -26,7 +26,7 @@ for dirpath, dirnames, filenames in os.walk(root_dir + processed_data_dir):
         continue
 
     # Create the output directory for the current action
-    output_dir = dirpath.replace(processed_data_dir, output_dir)
+    output_dir = dirpath.replace(processed_dir_name, output_dir)
     os.makedirs(output_dir, exist_ok=True)
     
 
