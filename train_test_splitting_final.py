@@ -34,7 +34,7 @@ import random
 import shutil
 # Define the paths
 train_dir = "/workspaces/video-dataset-preprocess/train-data-sample"
-ucf_preprocessed_dir_img = "/workspaces/video-dataset-preprocess/Dataset/UCF-preprocessed-sample"
+ucf_action_labelled_roi_dir_img = "/workspaces/video-dataset-preprocess/Dataset/UCF_action_labelled_roi_sample"
 ucf_obj_detected_dir_label = "/workspaces/video-dataset-preprocess/Dataset/UCF_obj_detected_sample"
 
 # Create train, test, and validation directories
