@@ -1,6 +1,14 @@
 /Dataset
 /Action
 
+/client
+
+/yolov5
+
+/ultralytics
+
+/Poae-detection
+
 /objdetect
 /path_to_output_directory
 /Pose-detetction

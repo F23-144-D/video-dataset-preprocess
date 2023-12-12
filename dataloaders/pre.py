@@ -229,7 +229,7 @@ class UCFDataset(Dataset):
 
 if __name__ == '__main__':
     # usage
-    root_dir = '/workspaces/video-dataset-preprocess/'
+    root_dir = 'F:/GitHub/video-dataset-preprocess/'
     root_list = root_dir + 'Dataset/UCF101_n_frames/'
     info_list = root_dir + 'Dataset/ucfTrainTestlist/updated_videos.txt'
     save_dir = root_dir + 'Dataset/UCF-preprocessed'

@@ -1,5 +1,3 @@
-
-
 import os
 import pandas as pd
 import numpy as np
@@ -82,7 +80,20 @@ class CenterCrop(object):
 
         return new_buffer
 
+# class RandomHorizontalFlip(object):
+#     """Horizontally flip the given Images randomly with a given probability.
 
+#     Args:
+#         p (float): probability of the image being flipped. Default value is 0.5
+#     """
+
+#     def __call__(self, buffer):
+#         if random.random() < self.p:
+#             buffer = np.flip(buffer, axis=2)
+#             print("Flipping Image")
+#         return buffer
+    
+    
 class RandomHorizontalFlip(object):
     """Horizontally flip the given Images randomly with a given probability.
 
@@ -95,8 +106,13 @@ class RandomHorizontalFlip(object):
             for i, frame in enumerate(buffer):
                 buffer[i] = cv2.flip(frame, flipCode=1)
 
-        return buffer
+                flip_dir = "./Dataset/UCF-preprocessed"  # Update the folder path
+                flip_dir = flip_dir + "/" + "image_" + str(i) + ".jpg"
 
+                cv2.imwrite(flip_dir, buffer[i])
+                print(frame, " is flipped")
+
+        return buffer
 
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
@@ -124,7 +140,7 @@ class UCFDataset(Dataset):
 
     """
 
-    def __init__(self, root_dir, info_list, split='train', clip_len=16):
+    def __init__(self, root_dir, info_list, clip_len=16, save_dir=None):
         self.root_dir = root_dir
         self.clip_len = clip_len
         self.landmarks_frame = pd.read_csv(info_list, delimiter=' ', header=None)
@@ -133,22 +149,21 @@ class UCFDataset(Dataset):
             for line in f:
                 line=line.strip('\n').split(' ')
                 self.label_class_map[line[1]] = line[0]
-        self.split = split
-        if split == 'train':
-            self.transform = transforms.Compose(
-                [ClipSubstractMean(),
-                 RandomCrop(),
-                 RandomHorizontalFlip(),
-                 ToTensor()])
-        else:
-            self.transform = transforms.Compose(
-                [ClipSubstractMean(),
-                 CenterCrop(),
-                 ToTensor()])
+        self.transform = transforms.Compose(
+            [ClipSubstractMean(),
+                RandomCrop(),
+                RandomHorizontalFlip(),
+                ToTensor()])
         # The following three parameters are chosen as described in the paper section 4.1
         self.resize_height = 128
         self.resize_width = 171
         self.crop_size = 112
+
+    
+        self.save_dir = save_dir
+        print(save_dir)
+        if self.save_dir is not None:
+            os.makedirs(self.save_dir, exist_ok=True)
 
     def __len__(self):
         return len(self.landmarks_frame)
@@ -199,6 +214,21 @@ class UCFDataset(Dataset):
 
                 # Store the frame in the array
                 video_x[i, :, :, :] = tmp_image
+            
+            if self.save_dir is not None:
+                # Save the preprocessed frame to the new directory
+                save_image_path = os.path.join(self.save_dir, dir_name)
+                
+                # Ensure the directory exists, create if necessary
+                os.makedirs(save_image_path, exist_ok=True)
+                
+                # Append the file name to the directory path
+                save_image_path = os.path.join(save_image_path, f'image_{i:05d}.jpg')
+
+                
+                print(save_image_path, "saved")
+                print(tmp_image.shape)
+                cv2.imwrite(save_image_path, tmp_image)
 
         return video_x
     
@@ -210,7 +240,7 @@ class UCFDataset(Dataset):
 if __name__ == '__main__':
     # usage
     root_list = './Dataset/UCF101_n_frames/'
-    info_list = './Dataset/ucfTrainTestlist/testlist01.txt'
+    info_list = './Dataset/ucfTrainTestlist/all_videos.txt'
 
     # trainUCF101 = UCFDataset(root_list, info_list,'test'
     #                           )
@@ -221,16 +251,16 @@ if __name__ == '__main__':
     #                               ToTensor()]))
 
     # dataloader = DataLoader(trainUCF101, batch_size=8, shuffle=True, num_workers=0)
-    test_dataloader = DataLoader(UCFDataset(root_dir='./Dataset/UCF101_n_frames',
-                                              info_list='./Dataset/ucfTrainTestlist/testlist01.txt',
-                                              split='test',
-                                              clip_len=16),
-                                 batch_size=8, shuffle=True,num_workers=0)
+    save_directory = './Dataset/UCF-preprocessed'
+    test_dataloader = DataLoader(
+        UCFDataset(root_dir=root_list,
+                info_list=info_list,
+                clip_len=16,
+                save_dir=save_directory),
+        batch_size=8, shuffle=True, num_workers=0
+    )
     
     torch.save(test_dataloader, 'processed_dataset.pth')
 
     for i_batch, (images, targets) in enumerate(test_dataloader):
         print(i_batch, images.size(), targets.size())
-
-
-        
