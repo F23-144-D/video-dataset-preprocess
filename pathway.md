@@ -16,24 +16,43 @@ now we have completed Data Loading and have UCF101_n_frames
 
 
 next we need to apply some basic preprocessing steps on it
+```
 /dataloaders/ucf_dataset-persistent.py
+```
+[UCF101_n_frames], [all_videos.txt], [classInd.txt] --> [UCF-preprocessed]
+now [UCF101_n_frames] has no dependancies 
 we have passed it file containing names of all videos rather than one file from ucfTrainTestList
 we get UCF-preprocessed
 
 next we apply ROI techiniques on it
 we apply a pretrained yolo model to detect people in the dataset and draw the bounding boxes
+```
 /model-predict-opti_final.py
+```
+[UCF-preprocessed] --> [UCF_obj_detected]
+[UCF-preprocessed] still has dependancies
 bboxes are stored in UCF_obj_detected
 
 next we need to alter the generated labels so they represent actions instead of objects
 we are also combining the bboxes and adding padding
+```
 /action_labelling_roi.py 
+```
+[UCF_obj_detected] --> [UCF_action_labelled_roi]
+now [UCF_obj_detected] has no dependancies
+
 # TODO
-[multi line testing] 
+multi line testing
+
 we get updated labels in UCF_action_labelled_roi
 
 next we need to split the datasets into train test and val
+```
 /train_test_splitting_final.py
+```
+[UCF_action_labelled_roi], [UCF-preprocessed] --> [train-data]
+now both datasets have no dependancies
+
 it takes labels from "UCF_action_labelled_roi" and images from "UCF-preprocessed"
 it splits them
 70% train
@@ -43,7 +62,11 @@ it splits them
 now we have our training data in /train-data
 
 next we will train a custom yolo model on the training data
+```
 /train-data/model-train.py
+```
+[train-data] --> [best.pt]
+now [train-data] has no dependancies, but it does contain model insights
 we will have our best.pt model in /train-data/runs
 
-# Thats it! we have our custom trained model
+Thats it! we have our custom trained model
