@@ -1,20 +1,21 @@
-first we convert UCF101 dataset to nframes, basically extracting frames from each video (at 1 fps)
-/utils/avi2jpg.py
+Steps:
+1.first we convert UCF101 dataset to nframes, basically extracting frames from each video (at 1 fps)
+/utils/avi2jpg-Final.py
 
-then we write n-frames data for each video folder
-/utils/n_frames_ucf101.py
+2. then we write n-frames data for each video folder
+/utils/n_frames_ucf101-Final.py
 
 now we have completed Data Loading and have UCF101_n_frames
 
 
-next we need to apply some basic preprocessing steps on it
-/dataloaders/ucf_dataset-persistent.py
+3. next we need to apply some basic preprocessing steps on it
+/dataloaders/ucf_dataset_persistent-Final.py
 we have passed it file containing names of all videos rather than one file from ucfTrainTestList
 we get UCF-preprocessed
 
 next we apply ROI techiniques on it
 we apply a pretrained yolo model to detect people in the dataset and draw the bounding boxes
-/model-predict-opti_final.py
+/model-predict-Final.py
 bboxes are stored in UCF_obj_detected
 
 next we need to alter the generated labels so they represent actions instead of objects
