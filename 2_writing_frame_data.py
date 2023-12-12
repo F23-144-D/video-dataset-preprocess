@@ -1,12 +1,12 @@
 from __future__ import print_function, division
 import os
-import sys
-import subprocess
 
-def class_process(dir_path, class_name):
+dir_path = './Dataset/UCF101_n_frames'
+
+for class_name in os.listdir(dir_path):
     class_path = os.path.join(dir_path, class_name)
     if not os.path.isdir(class_path):
-        return
+        continue
 
     for file_name in os.listdir(class_path):
         video_dir_path = os.path.join(class_path, file_name)
@@ -25,11 +25,4 @@ def class_process(dir_path, class_name):
             print(video_dir_path, n_frames)
         with open(os.path.join(video_dir_path, 'n_frames'), 'w') as dst_file:
             dst_file.write(str(n_frames))
-
-
-if __name__=="__main__":
-    # dir_path = sys.argv[1]
-    # dir_path = '/home/ran/mnt1/Dataset/hmdb51_n_frames'
-    dir_path = './Dataset/UCF101_n_frames'
-    for class_name in os.listdir(dir_path):
-        class_process(dir_path, class_name)
+        

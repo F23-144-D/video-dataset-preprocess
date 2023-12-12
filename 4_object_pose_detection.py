@@ -4,18 +4,17 @@ import os
 import glob
 
 
+# Define the root directory
+root_dir = '/workspaces/video-dataset-preprocess/Dataset'
+processed_data_dir = "/UCF-preprocessed"
+output_dir = "/UCF_obj_detected"
+
+
 # Load a pretrained YOLOv8n model
 model = YOLO('yolov8n-pose.pt')
 
-# Define the root directory
-root_dir = '/workspaces/video-dataset-preprocess/Dataset/UCF-preprocessed'
-
 # Walk through all files in the directory
-# i = 1
-for dirpath, dirnames, filenames in os.walk(root_dir):
-    # i = i + 1
-    # if i == 10:
-    #     break
+for dirpath, dirnames, filenames in os.walk(root_dir + processed_data_dir):
     
     print("dirpath: ", dirpath)
     print("dirnames: ", dirnames)
@@ -27,7 +26,7 @@ for dirpath, dirnames, filenames in os.walk(root_dir):
         continue
 
     # Create the output directory for the current action
-    output_dir = dirpath.replace(root_dir, "/workspaces/video-dataset-preprocess/Dataset/UCF_obj_detected")
+    output_dir = dirpath.replace(processed_data_dir, output_dir)
     os.makedirs(output_dir, exist_ok=True)
     
 

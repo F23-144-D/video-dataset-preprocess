@@ -1,13 +1,18 @@
 
-
 import os
 import pandas as pd
 import numpy as np
-import random
 from torchvision import transforms
 import cv2
 from torch.utils.data import Dataset, DataLoader
 import torch
+
+
+root_dir = '/workspaces/video-dataset-preprocess/'
+root_list = root_dir + 'Dataset/UCF101_n_frames/'
+info_list = root_dir + 'Dataset/ucfTrainTestlist/updated_videos.txt'
+save_dir = root_dir + 'Dataset/UCF-preprocessed'
+class_dir = root_dir + 'Dataset/ucfTrainTestlist/classInd.txt'
 
 
 class ClipSubstractMean(object):
@@ -94,13 +99,6 @@ class RandomHorizontalFlip(object):
         if np.random.random() < 0.5:
             for i, frame in enumerate(buffer):
                 buffer[i] = cv2.flip(frame, flipCode=1)
-
-                # flip_dir = "/workspaces/video-dataset-preprocess/Dataset/UCF-flipped"
-                # os.makedirs(flip_dir, exist_ok=True)
-                # flip_dir = flip_dir + "/" + "image_" + str(i) + ".jpg"
-
-                # cv2.imwrite(flip_dir, buffer[i])
-                # print(frame, " is flipped")
 
         return buffer
 
@@ -226,17 +224,8 @@ class UCFDataset(Dataset):
     
     
 
-
-
-
 if __name__ == '__main__':
     # usage
-    root_dir = '/workspaces/video-dataset-preprocess/'
-    root_list = root_dir + 'Dataset/UCF101_n_frames/'
-    info_list = root_dir + 'Dataset/ucfTrainTestlist/updated_videos.txt'
-    save_dir = root_dir + 'Dataset/UCF-preprocessed'
-    class_dir = root_dir + 'Dataset/ucfTrainTestlist/classInd.txt'
-
     test_dataloader = DataLoader(
         UCFDataset(
                 class_dir=class_dir,

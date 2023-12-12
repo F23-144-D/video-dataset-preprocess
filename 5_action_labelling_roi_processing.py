@@ -3,6 +3,12 @@ import os
 has to be run BEFORE train-test-val splitting
 because in the splitting, action association is lost
 """
+
+# Define the directory paths
+root_dir = "/workspaces/video-dataset-preprocess/Dataset"
+input_dir = root_dir + "/UCF_obj_detected_sample"
+output_dir = root_dir + "/UCF_action_labelled_roi_sample"
+
 #%% functions
 
 actions = {
@@ -171,13 +177,6 @@ take each of these labels, replace the first number (class id) with class from n
 """
 
 #%%
-# Define the directory paths
-root_dir = "/workspaces/video-dataset-preprocess/Dataset"
-input_dir = os.path.join(root_dir, "UCF_obj_detected_sample")
-output_dir = os.path.join(root_dir, "UCF_action_labelled_roi_sample")
-
-# # Ensure input directory exists
-# os.makedirs(input_dir, exist_ok=True)
 
 # Ensure output directory exists
 os.makedirs(output_dir, exist_ok=True)

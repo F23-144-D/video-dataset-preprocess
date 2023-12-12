@@ -32,10 +32,12 @@ hierarchy of UCF_obj_detected:
 import os
 import random
 import shutil
+
 # Define the paths
-train_dir = "/workspaces/video-dataset-preprocess/train-data-sample"
-ucf_action_labelled_roi_dir_label = "/workspaces/video-dataset-preprocess/Dataset/UCF_action_labelled_roi_sample"
-ucf_preprocessed_dir_img = "/workspaces/video-dataset-preprocess/Dataset/UCF_preprocessed_sample"
+root_dir = "/workspaces/video-dataset-preprocess"
+train_dir = root_dir + "/train-data-sample"
+ucf_action_labelled_roi_dir_label = root_dir + "/Dataset/UCF_action_labelled_roi_sample"
+ucf_preprocessed_dir_img = root_dir + "/Dataset/UCF_preprocessed_sample"
 
 # Create train, test, and validation directories
 train_data_dir = os.path.join(train_dir, "train")
@@ -45,8 +47,6 @@ val_data_dir = os.path.join(train_dir, "val")
 os.makedirs(train_data_dir, exist_ok=True)
 os.makedirs(test_data_dir, exist_ok=True)
 os.makedirs(val_data_dir, exist_ok=True)
-
-
 
 
 
@@ -165,7 +165,3 @@ for action_name in action_names:
 
 # Print the success message
 print("Train-test-val splitting and label assignment completed successfully!")
-
-
-# Print the success message
-print("Train-test-val splitting completed successfully!")
