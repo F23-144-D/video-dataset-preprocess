@@ -34,10 +34,10 @@ import random
 import shutil
 
 # Define the paths
-root_dir = "/workspaces/video-dataset-preprocess"
-train_dir = root_dir + "/train-data-sample"
-ucf_action_labelled_roi_dir_label = root_dir + "/Dataset/UCF_action_labelled_roi_sample"
-ucf_preprocessed_dir_img = root_dir + "/Dataset/UCF_preprocessed_sample"
+root_dir = "./Dataset"
+train_dir = root_dir + "/train-data"
+ucf_action_labelled_roi_dir_label = root_dir + "/UCF_action_labelled_roi"
+ucf_preprocessed_dir_img = root_dir + "/UCF_preprocessed"
 
 # Create train, test, and validation directories
 train_data_dir = os.path.join(train_dir, "train")

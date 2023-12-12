@@ -5,7 +5,7 @@ import glob
 
 
 # Define the root directory
-root_dir = '/workspaces/video-dataset-preprocess/Dataset'
+root_dir = './Dataset'
 processed_data_dir = "/UCF-preprocessed"
 output_dir = "/UCF_obj_detected"
 

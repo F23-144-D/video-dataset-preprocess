@@ -8,11 +8,14 @@ from torch.utils.data import Dataset, DataLoader
 import torch
 
 
-root_dir = '/workspaces/video-dataset-preprocess/'
+root_dir = './'
 root_list = root_dir + 'Dataset/UCF101_n_frames/'
-info_list = root_dir + 'Dataset/ucfTrainTestlist/updated_videos.txt'
+info_list = root_dir + 'all_videos.txt'
 save_dir = root_dir + 'Dataset/UCF-preprocessed'
-class_dir = root_dir + 'Dataset/ucfTrainTestlist/classInd.txt'
+class_dir = root_dir + 'classInd.txt'
+
+#frames per video
+CLIP_LENGTH = 8
 
 
 class ClipSubstractMean(object):
@@ -170,7 +173,6 @@ class UCFDataset(Dataset):
 
         if self.transform:
             buffer = self.transform(buffer)
-            # print(buffer, " is transformed")
 
         return buffer, torch.from_numpy(np.array(labels))
 
@@ -185,6 +187,8 @@ class UCFDataset(Dataset):
 
         # Initialize an array to store all frames
         video_x = np.empty((self.clip_len, self.resize_height, self.resize_width, 3), np.dtype('float32'))
+        
+        print(video_jpgs_path)
 
         for i in range(self.clip_len):
             # Compute the frame number based on the clip length
@@ -216,8 +220,7 @@ class UCFDataset(Dataset):
                 save_image_path = os.path.join(save_image_path, f'image_{i:05d}.jpg')
 
                 
-                print(save_image_path, "saved")
-                print(tmp_image.shape)
+                # print(save_image_path, "saved")
                 cv2.imwrite(save_image_path, tmp_image)
 
         return video_x
@@ -225,20 +228,17 @@ class UCFDataset(Dataset):
     
 
 if __name__ == '__main__':
-    # usage
     test_dataloader = DataLoader(
         UCFDataset(
                 class_dir=class_dir,
                 root_dir=root_list,
                 info_list=info_list,
-                clip_len=16,
+                clip_len=CLIP_LENGTH,
                 save_dir=save_dir),
         batch_size=8, shuffle=True, num_workers=0
     )
-    
-    torch.save(test_dataloader, 'processed_dataset.pth')
 
     for i_batch, (images, targets) in enumerate(test_dataloader):
-        print(i_batch, images.size(), targets.size())
+        print("-----------------Batch: ", i_batch)
 
         
