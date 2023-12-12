@@ -34,8 +34,8 @@ import random
 import shutil
 # Define the paths
 train_dir = "/workspaces/video-dataset-preprocess/train-data-sample"
-ucf_action_labelled_roi_dir_img = "/workspaces/video-dataset-preprocess/Dataset/UCF_action_labelled_roi_sample"
-ucf_obj_detected_dir_label = "/workspaces/video-dataset-preprocess/Dataset/UCF_obj_detected_sample"
+ucf_action_labelled_roi_dir_label = "/workspaces/video-dataset-preprocess/Dataset/UCF_action_labelled_roi_sample"
+ucf_preprocessed_dir_img = "/workspaces/video-dataset-preprocess/Dataset/UCF_preprocessed_sample"
 
 # Create train, test, and validation directories
 train_data_dir = os.path.join(train_dir, "train")
@@ -122,7 +122,7 @@ os.makedirs(val_label_dir, exist_ok=True)
 
 
 for action_name in action_names:
-    action_label_dir = os.path.join(ucf_obj_detected_dir_label, action_name)
+    action_label_dir = os.path.join(ucf_action_labelled_roi_dir_label, action_name)
     video_names = os.listdir(action_label_dir)
 
     # Iterate over each video name
