@@ -8,7 +8,7 @@ import glob
 model = YOLO('yolov8n-pose.pt')
 
 # Define the root directory
-root_dir = 'F:/GitHub/video-dataset-preprocess/Dataset/UCF-preprocessed'
+root_dir = 'F:/GitHub/video-dataset-preprocess/Dataset/UCF-preprocessed-guitar-onwards'
 
 # Walk through all files in the directory
 # i = 1

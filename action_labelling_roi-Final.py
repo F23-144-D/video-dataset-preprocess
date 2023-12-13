@@ -3,6 +3,15 @@ import os
 has to be run BEFORE train-test-val splitting
 because in the splitting, action association is lost
 """
+
+#either ROI or pose estimation
+APPLY_ROI = False
+
+# Define the directory paths
+root_dir = "./Dataset"
+input_dir = root_dir + "/UCF_obj_detected"
+output_dir = root_dir + "/UCF_action_labelled_roi"
+
 #%% functions
 
 actions = {
@@ -171,13 +180,6 @@ take each of these labels, replace the first number (class id) with class from n
 """
 
 #%%
-# Define the directory paths
-root_dir = "/workspaces/video-dataset-preprocess/Dataset"
-input_dir = os.path.join(root_dir, "UCF_obj_detected_sample")
-output_dir = os.path.join(root_dir, "UCF_action_labelled_roi_sample")
-
-# # Ensure input directory exists
-# os.makedirs(input_dir, exist_ok=True)
 
 # Ensure output directory exists
 os.makedirs(output_dir, exist_ok=True)
@@ -193,6 +195,8 @@ for action_name in os.listdir(input_dir):
         video_dir = os.path.join(action_dir, video_name)
         if not os.path.isdir(video_dir):
             continue
+
+        print(f"Processing {video_name}...")
 
         # Iterate over the label files
         labels_dir = os.path.join(video_dir, "predict", "labels")
@@ -212,23 +216,15 @@ for action_name in os.listdir(input_dir):
                 lines[i] = f"{action_id} {' '.join(rest)}"
 
             bboxes = [(float(bbox.split()[1]), float(bbox.split()[2]), float(bbox.split()[3]), float(bbox.split()[4])) for bbox in lines]
-            print("bboxes:        ", bboxes)
 
-            # Apply calculate_roi function
-            roi_bboxes = calculate_roi(bboxes)
-            print("roi_bboxes:    ", roi_bboxes)
-
-            # Apply add_padding function
-            padded_bboxes = add_padding(roi_bboxes)
-            print("padded_bboxes: ", padded_bboxes)
-
-            print("")
+            if APPLY_ROI:
+                roi_bboxes = calculate_roi(bboxes)
+                padded_bboxes = add_padding(roi_bboxes)
+            else:
+                padded_bboxes = add_padding(bboxes)
 
             # Convert the padded bounding boxes back to lines
             mod_lines = [f"{action_id} {bbox[0]} {bbox[1]} {bbox[2]} {bbox[3]}\n" for bbox in padded_bboxes]
-            print("lines:         ", mod_lines)
-            print("#############################################")
-            print("")
 
             # Write the modified label file to the output directory
             output_subdir = os.path.join(output_dir, action_name, video_name, "predict", "labels")

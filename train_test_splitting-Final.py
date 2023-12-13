@@ -29,46 +29,49 @@ hierarchy of UCF_obj_detected:
 
 """
 
+
+
+
+
 import os
-import random
 import shutil
-# Define the paths
-train_dir = "/workspaces/video-dataset-preprocess/train-data-sample"
-ucf_preprocessed_dir_img = "/workspaces/video-dataset-preprocess/Dataset/UCF-preprocessed-sample"
-ucf_obj_detected_dir_label = "/workspaces/video-dataset-preprocess/Dataset/UCF_obj_detected_sample"
+import random
 
-# Create train, test, and validation directories
-train_data_dir = os.path.join(train_dir, "train")
-test_data_dir = os.path.join(train_dir, "test")
-val_data_dir = os.path.join(train_dir, "val")
+# Define the root directories
+root_dir = "F:/GitHub/video-dataset-preprocess/"
+ucf_obj_detected_dir = os.path.join(root_dir, "Dataset/UCF_action_labelled_roi")
+ucf_preprocessed_dir = os.path.join(root_dir, "Dataset/UCF-preprocessed")
 
-os.makedirs(train_data_dir, exist_ok=True)
-os.makedirs(test_data_dir, exist_ok=True)
-os.makedirs(val_data_dir, exist_ok=True)
-
-
-
-
-
-#%% actions images
-#####################################################
-# images
+# Define the destination directories
+train_dir = os.path.join(root_dir, "train-data/train")
+test_data_dir = os.path.join(root_dir, "train-data/test")
+val_data_dir = os.path.join(root_dir, "train-data/val")
 
 # Get the list of action names
-action_names = os.listdir(ucf_preprocessed_dir_img)
+action_names = os.listdir(ucf_preprocessed_dir)
 
 # Iterate over each action name
 for action_name in action_names:
-    action_dir = os.path.join(ucf_preprocessed_dir_img, action_name)
-    video_names = os.listdir(action_dir)
+    # Define the source directories for each dataset
+    obj_detected_dir = os.path.join(ucf_obj_detected_dir, action_name)
+    preprocessed_dir = os.path.join(ucf_preprocessed_dir, action_name)
+
+    # Get the video names
+    video_names = os.listdir(preprocessed_dir)
 
     # Iterate over each video name
     for video_name in video_names:
-        video_dir = os.path.join(action_dir, video_name)
-        image_files = os.listdir(video_dir)
+        # Define the source directories for each video
+        detected_video_dir = os.path.join(obj_detected_dir, video_name, "predict/labels")
+        preprocessed_video_dir = os.path.join(preprocessed_dir, video_name)
 
-        # Randomly shuffle the image files
+        # Get the list of image and label files
+        image_files = os.listdir(preprocessed_video_dir)
+        label_files = os.listdir(detected_video_dir)
+
+        # Shuffle the files
         random.shuffle(image_files)
+        random.shuffle(label_files)
 
         # Calculate the number of images for each split
         num_images = len(image_files)
@@ -77,95 +80,62 @@ for action_name in action_names:
         num_val = num_images - num_train - num_test
 
         # Split the image files into train, test, and validation sets
-        train_files = image_files[:num_train]
-        test_files = image_files[num_train:num_train + num_test]
-        val_files = image_files[num_train + num_test:]
-
-        # Create the action directory in train, test, and validation directories
-        train_action_dir = os.path.join(train_data_dir, "images")
-        test_action_dir = os.path.join(test_data_dir, "images")
-        val_action_dir = os.path.join(val_data_dir, "images")
-
-        os.makedirs(train_action_dir, exist_ok=True)
-        os.makedirs(test_action_dir, exist_ok=True)
-        os.makedirs(val_action_dir, exist_ok=True)
-
-        # Copy the image files to the respective directories
-        for file in train_files:
-            src = os.path.join(video_dir, file)
-            dst = os.path.join(train_action_dir, file)
-            shutil.copy(src, dst)
-
-        for file in test_files:
-            src = os.path.join(video_dir, file)
-            dst = os.path.join(test_action_dir, file)
-            shutil.copy(src, dst)
-
-        for file in val_files:
-            src = os.path.join(video_dir, file)
-            dst = os.path.join(val_action_dir, file)
-            shutil.copy(src, dst)
-
-
-#%%
-#####################################################
-# labels
-
-# Assign actions to labels
-train_label_dir = os.path.join(train_dir, "train")
-test_label_dir = os.path.join(train_dir, "test")
-val_label_dir = os.path.join(train_dir, "val")
-
-os.makedirs(train_label_dir, exist_ok=True)
-os.makedirs(test_label_dir, exist_ok=True)
-os.makedirs(val_label_dir, exist_ok=True)
-
-
-for action_name in action_names:
-    action_label_dir = os.path.join(ucf_obj_detected_dir_label, action_name)
-    video_names = os.listdir(action_label_dir)
-
-    # Iterate over each video name
-    for video_name in video_names:
-        labels_dir = os.path.join(action_label_dir, video_name, "predict", "labels")
-        label_files = os.listdir(labels_dir)
+        train_images = image_files[:num_train]
+        test_images = image_files[num_train:num_train + num_test]
+        val_images = image_files[num_train + num_test:]
 
         # Split the label files into train, test, and validation sets
-        train_files = label_files[:num_train]
-        test_files = label_files[num_train:num_train + num_test]
-        val_files = label_files[num_train + num_test:]
+        train_labels = label_files[:num_train]
+        test_labels = label_files[num_train:num_train + num_test]
+        val_labels = label_files[num_train + num_test:]
 
-        # Create the action directory in train, test, and validation directories
-        train_action_dir = os.path.join(train_label_dir, "labels")
-        test_action_dir = os.path.join(test_label_dir, "labels")
-        val_action_dir = os.path.join(val_label_dir, "labels")
+        # Define the destination directories for images and labels
+        train_img_dir = os.path.join(train_dir, "images")
+        train_lbl_dir = os.path.join(train_dir, "labels")
+        test_img_dir = os.path.join(test_data_dir, "images")
+        test_lbl_dir = os.path.join(test_data_dir, "labels")
+        val_img_dir = os.path.join(val_data_dir, "images")
+        val_lbl_dir = os.path.join(val_data_dir, "labels")
 
-        os.makedirs(train_action_dir, exist_ok=True)
-        os.makedirs(test_action_dir, exist_ok=True)
-        os.makedirs(val_action_dir, exist_ok=True)
+        # Create the destination directories
+        os.makedirs(train_img_dir, exist_ok=True)
+        os.makedirs(train_lbl_dir, exist_ok=True)
+        os.makedirs(test_img_dir, exist_ok=True)
+        os.makedirs(test_lbl_dir, exist_ok=True)
+        os.makedirs(val_img_dir, exist_ok=True)
+        os.makedirs(val_lbl_dir, exist_ok=True)
+
+        # Copy and rename the image files to the respective directories
+        for file in train_images:
+            _, image_name = os.path.split(file)
+            new_name = f"{action_name}_{video_name}_{image_name}"
+            shutil.copy(os.path.join(preprocessed_video_dir, file), os.path.join(train_img_dir, new_name))
+
+        for file in test_images:
+            _, image_name = os.path.split(file)
+            new_name = f"{action_name}_{video_name}_{image_name}"
+            shutil.copy(os.path.join(preprocessed_video_dir, file), os.path.join(test_img_dir, new_name))
+
+        for file in val_images:
+            _, image_name = os.path.split(file)
+            new_name = f"{action_name}_{video_name}_{image_name}"
+            shutil.copy(os.path.join(preprocessed_video_dir, file), os.path.join(val_img_dir, new_name))
+
+        # Create the destination directory for label files
+        os.makedirs(train_lbl_dir, exist_ok=True)
 
         # Copy the label files to the respective directories
-        for file in train_files:
-            src = os.path.join(labels_dir, file)
-            dst = os.path.join(train_action_dir, file)
-            shutil.copy(src, dst)
+        for file in train_labels:
+            _, label_name = os.path.split(file)
+            new_name = f"{action_name}_{video_name}_{label_name}"
+            shutil.copy(os.path.join(detected_video_dir, file), os.path.join(train_lbl_dir, new_name))
 
-        for file in test_files:
-            src = os.path.join(labels_dir, file)
-            dst = os.path.join(test_action_dir, file)
-            shutil.copy(src, dst)
+        for file in test_labels:
+            _, label_name = os.path.split(file)
+            new_name = f"{action_name}_{video_name}_{label_name}"
+            shutil.copy(os.path.join(detected_video_dir, file), os.path.join(test_lbl_dir, new_name))
 
-        for file in val_files:
-            src = os.path.join(labels_dir, file)
-            dst = os.path.join(val_action_dir, file)
-            shutil.copy(src, dst)
-
-
-        
-
-# Print the success message
-print("Train-test-val splitting and label assignment completed successfully!")
-
-
-# Print the success message
-print("Train-test-val splitting completed successfully!")
+        for file in val_labels:
+            _, label_name = os.path.split(file)
+            new_name = f"{action_name}_{video_name}_{label_name}"
+            shutil.copy(os.path.join(detected_video_dir, file), os.path.join(val_lbl_dir, new_name))
