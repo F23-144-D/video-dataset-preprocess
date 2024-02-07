@@ -224,12 +224,15 @@ for action_name in os.listdir(input_dir):
                 padded_bboxes = add_padding(bboxes)
 
             # Convert the padded bounding boxes back to lines
-            mod_lines = [f"{action_id} {bbox[0]} {bbox[1]} {bbox[2]} {bbox[3]}\n" for bbox in padded_bboxes]
+            for i in range(len(lines)):
+                _, bbox1, bbox2, bbox3, bbox4, *rest = lines[i].split()
+                lines[i] = f"{action_id} {padded_bboxes[i][0]} {padded_bboxes[i][1]} {padded_bboxes[i][2]} {padded_bboxes[i][3]}, {' '.join(rest)}"
+            # mod_lines = [f"{action_id} {bbox[0]} {bbox[1]} {bbox[2]} {bbox[3]}\n" for bbox in padded_bboxes]
 
             # Write the modified label file to the output directory
             output_subdir = os.path.join(output_dir, action_name, video_name, "predict", "labels")
             os.makedirs(output_subdir, exist_ok=True)
             output_file = os.path.join(output_subdir, frame_name)
             with open(output_file, "w") as f:
-                f.writelines(mod_lines)
+                f.writelines(lines)
 

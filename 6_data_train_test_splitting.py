@@ -37,7 +37,7 @@ import shutil
 root_dir = "./Dataset"
 train_dir = root_dir + "/train-data"
 ucf_action_labelled_roi_dir_label = root_dir + "/UCF_action_labelled_roi"
-ucf_preprocessed_dir_img = root_dir + "/UCF_preprocessed"
+ucf_preprocessed_dir_img = root_dir + "/UCF-preprocessed"
 
 # Create train, test, and validation directories
 train_data_dir = os.path.join(train_dir, "train")
@@ -91,20 +91,29 @@ for action_name in action_names:
         os.makedirs(val_action_dir, exist_ok=True)
 
         # Copy the image files to the respective directories
+        print()
+        print("-----------------------------------Copying images in train")
         for file in train_files:
             src = os.path.join(video_dir, file)
-            dst = os.path.join(train_action_dir, file)
+            dst = os.path.join(train_action_dir, f"{video_name}_{file}")
             shutil.copy(src, dst)
+            print(f"Copying {src} to {dst}")
 
+        print()
+        print("-----------------------------------Copying images in test")
         for file in test_files:
             src = os.path.join(video_dir, file)
-            dst = os.path.join(test_action_dir, file)
+            dst = os.path.join(test_action_dir, f"{video_name}_{file}")
             shutil.copy(src, dst)
-
+            print(f"Copying {src} to {dst}")
+        
+        print()
+        print("-----------------------------------Copying images in val")
         for file in val_files:
             src = os.path.join(video_dir, file)
-            dst = os.path.join(val_action_dir, file)
+            dst = os.path.join(val_action_dir, f"{video_name}_{file}")
             shutil.copy(src, dst)
+            print(f"Copying {src} to {dst}")
 
 
 #%%
@@ -147,21 +156,15 @@ for action_name in action_names:
         # Copy the label files to the respective directories
         for file in train_files:
             src = os.path.join(labels_dir, file)
-            dst = os.path.join(train_action_dir, file)
+            dst = os.path.join(train_action_dir, f"{video_name}_{file}")
             shutil.copy(src, dst)
 
         for file in test_files:
             src = os.path.join(labels_dir, file)
-            dst = os.path.join(test_action_dir, file)
+            dst = os.path.join(test_action_dir, f"{video_name}_{file}")
             shutil.copy(src, dst)
 
         for file in val_files:
             src = os.path.join(labels_dir, file)
-            dst = os.path.join(val_action_dir, file)
+            dst = os.path.join(val_action_dir, f"{video_name}_{file}")
             shutil.copy(src, dst)
-
-
-        
-
-# Print the success message
-print("Train-test-val splitting and label assignment completed successfully!")

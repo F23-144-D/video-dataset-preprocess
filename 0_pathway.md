@@ -1,7 +1,7 @@
 first we convert UCF101 dataset to nframes, basically extracting frames from each video (at 1 fps)
 
 ```
-/utils/avi2jpg.py
+1_frame_extraction.py
 ```
 
 [UCF101] --> [UCF101_n_frames]
@@ -10,7 +10,7 @@ now [UCF101] has no dependancies
 then we write n-frames data for each video folder
 
 ```
-/utils/n_frames_ucf101.py
+2_writing_frame_data.py
 ```
 
 [UCF101_n_frames] <--->
@@ -21,7 +21,7 @@ now we have completed Data Loading and have UCF101_n_frames
 next we need to apply some basic preprocessing steps on it
 
 ```
-/dataloaders/ucf_dataset-persistent.py
+3_data_preprocessing.py
 ```
 
 [UCF101_n_frames], [all_videos.txt], [classInd.txt] --> [UCF-preprocessed]
@@ -33,7 +33,7 @@ next we apply ROI techiniques on it
 we apply a pretrained yolo model to detect people in the dataset and draw the bounding boxes
 
 ```
-/model-predict-opti_final.py
+4_object_pose_detection.py
 ```
 
 [UCF-preprocessed] --> [UCF_obj_detected]
@@ -44,7 +44,7 @@ next we need to alter the generated labels so they represent actions instead of 
 we are also combining the bboxes and adding padding
 
 ```
-/action_labelling_roi.py 
+5_action_labelling_roi_preprocessing.py 
 ```
 
 [UCF_obj_detected] --> [UCF_action_labelled_roi]
@@ -59,7 +59,7 @@ we get updated labels in UCF_action_labelled_roi
 next we need to split the datasets into train test and val
 
 ```
-/train_test_splitting_final.py
+6_data_train_test_splitting.py
 ```
 
 [UCF_action_labelled_roi], [UCF-preprocessed] --> [train-data]
@@ -76,7 +76,7 @@ now we have our training data in /train-data
 next we will train a custom yolo model on the training data
 
 ```
-/train-data/model-train.py
+7_action_detection_model_training.py
 ```
 
 [train-data], [ucf101.yaml] --> [best.pt]

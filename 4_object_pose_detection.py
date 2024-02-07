@@ -26,7 +26,7 @@ for dirpath, dirnames, filenames in os.walk(processed_dir):
         continue
 
     # Create the output directory for the current action
-    output_dir = dirpath.replace(processed_dir_name, output_dir)
+    output_dir = dirpath.replace(processed_dir_name, output_dir_name)
     os.makedirs(output_dir, exist_ok=True)
     
 
