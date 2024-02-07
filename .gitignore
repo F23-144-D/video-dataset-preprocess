@@ -3,3 +3,8 @@
 /yolov5
 /ultralytics
 /runs
+
+/client
+/train-data
+/client/node_modules
+/colab_notebook
