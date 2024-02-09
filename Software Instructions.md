@@ -1,4 +1,4 @@
-# Dataset
+# Step 1: Dataset Download
 
 Download the UCF101 dataset from the below website
 
@@ -6,7 +6,7 @@ Download the UCF101 dataset from the below website
 https://www.crcv.ucf.edu/data/UCF101.php
 ```
 
-# Conversion of Video to Images
+# Step 2: Conversion of Video to Images
 
 Convert UCF101 video dataset to images
 
@@ -16,7 +16,7 @@ Convert UCF101 video dataset to images
 
 [UCF101] --> [UCF101_n_frames]
 
-# Conversion of Video folder into n-frames
+# Step 3: Conversion of Videos into n-frames
 
 Convert UCF101 dataset to nframes, basically extracting frames from each video (at 1 fps) and then then we write n-frames data for each video folder
 
@@ -36,7 +36,7 @@ now we have completed Data Loading and have UCF101_n_frames
 
 next we need to apply some basic preprocessing steps on it
 
-# Data Pre-processing
+# Step 4: Data Pre-processing
 
 ```
 3. dataloaders/ucf_dataset_persistent-Final.py                  ['Dataset/UCF-preprocessed']
@@ -50,7 +50,7 @@ we get UCF-preprocessed
 next we apply ROI techiniques on it
 we apply a pretrained yolo model to detect people in the dataset and draw the bounding boxes
 
-# Merging all videos list
+# Step 5: Merging all videos list
 
 ```
 4. dataloaders/merging_all_videos-Final.py                      ['Dataset/ucfTrainTestlist/all_videos.txt']
@@ -58,7 +58,15 @@ we apply a pretrained yolo model to detect people in the dataset and draw the bo
 
 ['Dataset/ucfTrainTestlist/all_videos.txt']
 
-# Object Pose Detection
+# Step 6: Setup Environment
+
+Install Ultralytics YOLO for the pose detection
+
+```
+pip install -U ultralytics
+```
+
+# Step 7: Object Pose Detection
 
 ```
 5. model-predict-Final.py                                       ['Dataset/UCF_obj_detected']
@@ -71,7 +79,7 @@ bboxes are stored in UCF_obj_detected
 next we need to alter the generated labels so they represent actions instead of objects
 we are also combining the bboxes and adding padding
 
-# Action Labelling & ROI Pre-processing
+# Step 8: Action Labelling & ROI Pre-processing
 
 ```
 6. action_labelling_roi-Final.py                                 ['Dataset/UCF_action_labelled_roi']
@@ -88,7 +96,7 @@ we get updated labels in UCF_action_labelled_roi
 
 next we need to split the datasets into train test and val
 
-# Splitting in Train, Val, Test Folders
+# Step 9: Splitting in Train, Val, Test Folders
 
 ```
 7. train_test_splitting-Final.py
@@ -107,7 +115,7 @@ now we have our training data in /train-data
 
 next we will train a custom yolo model on the training data
 
-# Model Training
+# Step 10: Model Training
 
 ```
 8. train-data/model-train-Final.py
