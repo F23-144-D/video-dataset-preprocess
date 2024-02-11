@@ -1,0 +1,36 @@
+# path: "C:/Users/Hp/OneDrive - FAST National University/Desktop/Imagine Cup/HealthCane- Software/Dataset/UCF-organized/"
+# train: "C:/Users/Hp/OneDrive - FAST National University/Desktop/Imagine Cup/HealthCane- Software/train-data/train/images"
+# test: "C:/Users/Hp/OneDrive - FAST National University/Desktop/Imagine Cup/HealthCane- Software/train-data/test/images"
+# val: "C:/Users/Hp/OneDrive - FAST National University/Desktop/Imagine Cup/HealthCane- Software/train-data/val/images"
+
+# # Keypoints
+# kpt_shape: [17, 3] # number of keypoints, number of dims (2 for x,y or 3 for x,y,visible)
+# # flip_idx: [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
+
+# # Classes
+# names:
+#   0: ApplyEyeMakeup
+#   1: ApplyLipstick
+
+
+
+
+path: ../datasets/UCF101-pose
+train: F:/GitHub/video-dataset-preprocess/datasets/UCF101-pose/images/train
+val: F:/GitHub/video-dataset-preprocess/datasets/UCF101-pose/images/val
+# test: "C:/Users/Hp/OneDrive - FAST National University/Desktop/Imagine Cup/HealthCane- Software/train-data/test/images"
+
+# Keypoints
+kpt_shape: [17, 3] # number of keypoints, number of dims (2 for x,y or 3 for x,y,visible)
+flip_idx: [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
+
+# Classes
+names:
+  0: ApplyEyeMakeup
+  1: ApplyLipstick
+
+# # number of classes
+# nc: 2
+
+# names: [ 'ApplyEyeMakeup', 'ApplyLipstick']  # class names
+
