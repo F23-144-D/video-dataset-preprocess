@@ -118,55 +118,6 @@ actions = {
     "YoYo": 100
 }
 
-
-# overwrite classes in labels with class corresponding to action_name
-
-# Calculate the ROI for a set of bounding boxes
-def calculate_roi(bboxes):
-    min_x = float('inf')
-    min_y = float('inf')
-    max_x = float('-inf')
-    max_y = float('-inf')
-
-    roi_bboxes = []
-
-    # Find the minimum and maximum coordinates
-    for bbox in bboxes:
-        x, y, w, h = bbox
-        min_x = min(min_x, x)
-        min_y = min(min_y, y)
-        max_x = max(max_x, x + w)
-        max_y = max(max_y, y + h)
-
-        # Calculate the ROI coordinates
-        roi_x = min_x
-        roi_y = min_y
-        roi_w = max_x - min_x
-        roi_h = max_y - min_y
-
-        roi_bboxes.append((roi_x, roi_y, roi_w, roi_h))
-
-    return roi_bboxes
-
-# Add padding to a set of bounding boxes
-def add_padding(bboxes, padding_percent = 0.1):
-    padded_bboxes = []
-
-    # Calculate the padding values
-    padding_x = padding_percent * bboxes[0][2]
-    padding_y = padding_percent * bboxes[0][3]
-
-    # Add padding to each bounding box
-    for bbox in bboxes:
-        x, y, w, h = bbox
-        padded_x = x - padding_x
-        padded_y = y - padding_y
-        padded_w = w + 2 * padding_x
-        padded_h = h + 2 * padding_y
-        padded_bboxes.append((padded_x, padded_y, padded_w, padded_h))
-
-    return padded_bboxes
-
 #%%
 """
 applied on Dataset/UCF_obj_detected
@@ -217,27 +168,8 @@ for action_name in os.listdir(input_dir):
                 lines[i] = f"{action_id} {' '.join(rest[:54])}"
                 print(f"Line {i} after action labelling: ", lines[i])
                 
-                
             print("-----------------------------------------------------------------------")
 
-            # bboxes = [(float(bbox.split()[1]), float(bbox.split()[2]), float(bbox.split()[3]), float(bbox.split()[4])) for bbox in lines]
-            # # print("Original bboxes: ", bboxes)
-
-            # if APPLY_ROI:
-            #     roi_bboxes = calculate_roi(bboxes)
-            #     padded_bboxes = add_padding(roi_bboxes)
-            # else:
-            #     padded_bboxes = add_padding(bboxes)
-            
-            # # print("Processed bboxes: ", padded_bboxes)
-
-            # # Convert the padded bounding boxes back to lines
-            # for i in range(len(lines)):
-            #     _, bbox1, bbox2, bbox3, bbox4, *rest = lines[i].split()
-            #     lines[i] = f"{action_id} {padded_bboxes[i][0]} {padded_bboxes[i][1]} {padded_bboxes[i][2]} {padded_bboxes[i][3]} {' '.join(rest)}"
-            #     print(f"Line {i} after modding: ", lines[i])
-            # # mod_lines = [f"{action_id} {bbox[0]} {bbox[1]} {bbox[2]} {bbox[3]}\n" for bbox in padded_bboxes]
-            
             print("#####################################################################")
             print("")
             print("")
