@@ -160,12 +160,17 @@ for action_name in os.listdir(input_dir):
             # Read the label file
             with open(label_file, "r") as f:
                 lines = f.readlines()
+                modlines = f.readlines()
+                
+            #empty mod lines
+            for i in range(len(modlines)):
+                modlines[i] = " "
 
             # Replace the class id with the action id
             action_id = actions[action_name]
             for i in range(len(lines)):
                 class_id, *rest = lines[i].split()
-                lines[i] = f"{action_id} {' '.join(rest[:54])}"
+                lines[i] = f"{action_id} {' '.join(rest)}\n"  # Append newline character
                 print(f"Line {i} after action labelling: ", lines[i])
                 
             print("-----------------------------------------------------------------------")
