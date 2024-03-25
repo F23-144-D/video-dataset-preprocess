@@ -1,8 +1,6 @@
 import os
 import subprocess
-
-#frames per second to extract
-FPS_RATE = 1
+from parameters import FPS_RATE
 
 #paths
 dir_path = 'Dataset/UCF-101/'

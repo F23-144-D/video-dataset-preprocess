@@ -1,11 +1,7 @@
 #  ACTION DETECTION 
 from ultralytics import YOLO
-
-# Load a model
-model = YOLO('yolov8n-pose.yaml')  # build a new model from YAML
-model = YOLO('yolov8n-pose.pt')  # load a pretrained model (recommended for training)
-model = YOLO('yolov8n-pose.yaml').load('yolov8n-pose.pt')  # build from YAML and transfer weights
+from parameters import trainModel, yamlFile, numEpochs, imageSize
 
 # Train the model
-results = model.train(data='action_detection_model_config.yaml', epochs=10, imgsz=640)
+results = trainModel.train(data=yamlFile, epochs=numEpochs, imgsz=imageSize)
 

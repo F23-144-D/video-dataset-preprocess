@@ -4,8 +4,7 @@ has to be run BEFORE train-test-val splitting
 because in the splitting, action association is lost
 """
 
-#either ROI or pose estimation
-APPLY_ROI = False
+from parameters import APPLY_ROI
 
 # Define the directory paths
 root_dir = "./Dataset"

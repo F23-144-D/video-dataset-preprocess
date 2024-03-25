@@ -7,15 +7,14 @@ import cv2
 from torch.utils.data import Dataset, DataLoader
 import torch
 
+from parameters import CLIP_LENGTH
+
 
 root_dir = './'
 root_list = root_dir + 'Dataset/UCF101_n_frames/'
 info_list = root_dir + 'all_videos.txt'
 save_dir = root_dir + 'Dataset/UCF-preprocessed'
 class_dir = root_dir + 'classInd.txt'
-
-#frames per video
-CLIP_LENGTH = 8
 
 
 class ClipSubstractMean(object):

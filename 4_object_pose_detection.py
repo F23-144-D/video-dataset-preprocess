@@ -3,15 +3,14 @@ from ultralytics import YOLO
 import os
 import glob
 
+from parameters import detectModel
+
 # Define the root directory
 root_dir = './Dataset'
 processed_dir_name = "/UCF-preprocessed"
 output_dir_name = "/UCF_obj_detected"
 
 processed_dir = root_dir + processed_dir_name
-
-# Load a pretrained YOLOv8n model
-model = YOLO('yolov8n-pose.pt')
 
 # Walk through all files in the directory
 for dirpath, dirnames, filenames in os.walk(processed_dir):
@@ -32,5 +31,5 @@ for dirpath, dirnames, filenames in os.walk(processed_dir):
 
     print("")
     print("")
-    model.predict(source=dirpath, conf=0.5, save_txt=True, project=output_dir)
+    detectModel.predict(source=dirpath, conf=0.5, save_txt=True, project=output_dir)
     print("completed model run on ", dirpath)
