@@ -13,3 +13,6 @@
 pyvenv.cfg
 
 .vscode/
+
+yolov8x.pt
+yolov8x-pose.pt
