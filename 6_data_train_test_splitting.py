@@ -62,11 +62,15 @@ print("###################################### IMAGE SPLITTING ##################
 # Iterate over each action name
 for action_name in action_names:
     action_dir = os.path.join(ucf_preprocessed_dir_img, action_name)
+    # label_dir = os.path.join(ucf_action_labelled_roi_dir_label, action_name)
+    
     video_names = os.listdir(action_dir)
 
     # Iterate over each video name
     for video_name in video_names:
         video_dir = os.path.join(action_dir, video_name)
+        # label_video_dir = os.path.join(label_dir, video_name, "predict", "labels")
+        
         image_files = os.listdir(video_dir)
 
         # Randomly shuffle the image files
@@ -91,92 +95,145 @@ for action_name in action_names:
         os.makedirs(train_action_dir, exist_ok=True)
         os.makedirs(test_action_dir, exist_ok=True)
         os.makedirs(val_action_dir, exist_ok=True)
+        
+        #make label dirs
+        train_label_dir = os.path.join(train_data_dir, "labels")
+        test_label_dir = os.path.join(test_data_dir, "labels")
+        val_label_dir = os.path.join(val_data_dir, "labels")
+        
+        os.makedirs(train_label_dir, exist_ok=True)
+        os.makedirs(test_label_dir, exist_ok=True)
+        os.makedirs(val_label_dir, exist_ok=True)
 
         # Copy the image files to the respective directories
         print()
-        print("-----------------------------------Copying images in train")
+        print("-----------------------------------Copying in train")
         for file in train_files:
             src = os.path.join(video_dir, file)
-            dst = os.path.join(train_action_dir, f"{video_name}_{file}")
+            dst = os.path.join(train_action_dir, f"{video_name}_{file}") #to prevent same name files overwriting
+            
+            #string manip for label
+            # src -- root_dir/ucf_preprocessed_dir_img/action_name/video_name/{image_name}.jpg
+            # src_label -- root_dir/ucf_action_labelled_roi_dir_label/action_name/video_name/predict/labels/{image_name}.txt
+            
+            # dst -- root_dir/train_dir/train/images/{video_name}+{image_name}.jpg
+            # dst_label -- root_dir/train_dir/train/labels/{video_name}+{image_name}.txt
+            
+            #manip on src
+            src_label = src.replace("UCF-preprocessed", "UCF_action_labelled_roi")
+            src_label = src_label.replace("images", "predict/labels")
+            src_label = src_label.replace(".jpg", ".txt")
+            
+            #manip on dst
+            dst_label = dst.replace("images", "labels")
+            dst_label = dst_label.replace(".jpg", ".txt")
+            
             shutil.copy(src, dst)
-            print(f"Copying {src} to {dst}")
+            shutil.copy(src_label, dst_label)
+            print(f"Copying IMAGE {src} to {dst}")
+            print(f"Copying LABEL {src_label} to {dst_label}")
+            
 
         print()
-        print("-----------------------------------Copying images in test")
+        print("-----------------------------------Copying in test")
         for file in test_files:
             src = os.path.join(video_dir, file)
             dst = os.path.join(test_action_dir, f"{video_name}_{file}")
+            
+            #manip on src
+            src_label = src.replace("UCF-preprocessed", "UCF_action_labelled_roi")
+            src_label = src_label.replace("images", "predict/labels")
+            src_label = src_label.replace(".jpg", ".txt")
+            
+            #manip on dst
+            dst_label = dst.replace("images", "labels")
+            dst_label = dst_label.replace(".jpg", ".txt")
+            
             shutil.copy(src, dst)
-            print(f"Copying {src} to {dst}")
+            shutil.copy(src_label, dst_label)
+            print(f"Copying IMAGE {src} to {dst}")
+            print(f"Copying LABEL {src_label} to {dst_label}")
         
         print()
-        print("-----------------------------------Copying images in val")
+        print("-----------------------------------Copying in val")
         for file in val_files:
             src = os.path.join(video_dir, file)
             dst = os.path.join(val_action_dir, f"{video_name}_{file}")
+            
+            #manip on src
+            src_label = src.replace("UCF-preprocessed", "UCF_action_labelled_roi")
+            src_label = src_label.replace("images", "predict/labels")
+            src_label = src_label.replace(".jpg", ".txt")
+            
+            #manip on dst
+            dst_label = dst.replace("images", "labels")
+            dst_label = dst_label.replace(".jpg", ".txt")
+            
             shutil.copy(src, dst)
-            print(f"Copying {src} to {dst}")
+            shutil.copy(src_label, dst_label)
+            print(f"Copying IMAGE {src} to {dst}")
+            print(f"Copying LABEL {src_label} to {dst_label}")
 
 
 #%%
 #####################################################
-# labels
+# # labels
 
-# Assign actions to labels
-train_label_dir = os.path.join(train_dir, "train")
-test_label_dir = os.path.join(train_dir, "test")
-val_label_dir = os.path.join(train_dir, "val")
+# # Assign actions to labels
+# train_label_dir = os.path.join(train_dir, "train")
+# test_label_dir = os.path.join(train_dir, "test")
+# val_label_dir = os.path.join(train_dir, "val")
 
-os.makedirs(train_label_dir, exist_ok=True)
-os.makedirs(test_label_dir, exist_ok=True)
-os.makedirs(val_label_dir, exist_ok=True)
+# os.makedirs(train_label_dir, exist_ok=True)
+# os.makedirs(test_label_dir, exist_ok=True)
+# os.makedirs(val_label_dir, exist_ok=True)
 
-print()
-print()
-print()
-print("###################################### LABEL SPLITTING ######################################")
+# print()
+# print()
+# print()
+# print("###################################### LABEL SPLITTING ######################################")
 
-for action_name in action_names:
-    action_label_dir = os.path.join(ucf_action_labelled_roi_dir_label, action_name)
-    video_names = os.listdir(action_label_dir)
+# for action_name in action_names:
+#     action_label_dir = os.path.join(ucf_action_labelled_roi_dir_label, action_name)
+#     video_names = os.listdir(action_label_dir)
 
-    # Iterate over each video name
-    for video_name in video_names:
-        labels_dir = os.path.join(action_label_dir, video_name, "predict", "labels")
-        label_files = os.listdir(labels_dir)
+#     # Iterate over each video name
+#     for video_name in video_names:
+#         labels_dir = os.path.join(action_label_dir, video_name, "predict", "labels")
+#         label_files = os.listdir(labels_dir)
 
-        # Split the label files into train, test, and validation sets
-        train_files = label_files[:num_train]
-        test_files = label_files[num_train:num_train + num_test]
-        val_files = label_files[num_train + num_test:]
+#         # Split the label files into train, test, and validation sets
+#         train_files = label_files[:num_train]
+#         test_files = label_files[num_train:num_train + num_test]
+#         val_files = label_files[num_train + num_test:]
 
-        # Create the action directory in train, test, and validation directories
-        train_action_dir = os.path.join(train_label_dir, "labels")
-        test_action_dir = os.path.join(test_label_dir, "labels")
-        val_action_dir = os.path.join(val_label_dir, "labels")
+#         # Create the action directory in train, test, and validation directories
+#         train_action_dir = os.path.join(train_label_dir, "labels")
+#         test_action_dir = os.path.join(test_label_dir, "labels")
+#         val_action_dir = os.path.join(val_label_dir, "labels")
 
-        os.makedirs(train_action_dir, exist_ok=True)
-        os.makedirs(test_action_dir, exist_ok=True)
-        os.makedirs(val_action_dir, exist_ok=True)
+#         os.makedirs(train_action_dir, exist_ok=True)
+#         os.makedirs(test_action_dir, exist_ok=True)
+#         os.makedirs(val_action_dir, exist_ok=True)
 
-        # Copy the label files to the respective directories
-        print()
-        print("-----------------------------------Copying labels in train")
-        for file in train_files:
-            src = os.path.join(labels_dir, file)
-            dst = os.path.join(train_action_dir, f"{video_name}_{file}")
-            shutil.copy(src, dst)
+#         # Copy the label files to the respective directories
+#         print()
+#         print("-----------------------------------Copying labels in train")
+#         for file in train_files:
+#             src = os.path.join(labels_dir, file)
+#             dst = os.path.join(train_action_dir, f"{video_name}_{file}")
+#             shutil.copy(src, dst)
 
-        print()
-        print("-----------------------------------Copying labels in test")
-        for file in test_files:
-            src = os.path.join(labels_dir, file)
-            dst = os.path.join(test_action_dir, f"{video_name}_{file}")
-            shutil.copy(src, dst)
+#         print()
+#         print("-----------------------------------Copying labels in test")
+#         for file in test_files:
+#             src = os.path.join(labels_dir, file)
+#             dst = os.path.join(test_action_dir, f"{video_name}_{file}")
+#             shutil.copy(src, dst)
 
-        print()
-        print("-----------------------------------Copying labels in val")
-        for file in val_files:
-            src = os.path.join(labels_dir, file)
-            dst = os.path.join(val_action_dir, f"{video_name}_{file}")
-            shutil.copy(src, dst)
+#         print()
+#         print("-----------------------------------Copying labels in val")
+#         for file in val_files:
+#             src = os.path.join(labels_dir, file)
+#             dst = os.path.join(val_action_dir, f"{video_name}_{file}")
+#             shutil.copy(src, dst)
