@@ -120,8 +120,8 @@ for action_name in action_names:
             # dst_label -- root_dir/train_dir/train/labels/{video_name}+{image_name}.txt
             
             #manip on src
-            src_label = src.replace("UCF-preprocessed", "UCF_action_labelled_roi")
-            src_label = src_label.replace("images", "predict/labels")
+            src_label = src.replace(f"{ucf_preprocessed_dir_img}", f"{ucf_action_labelled_roi_dir_label}")
+            src_label = src_label.replace("image", "predict/labels/image")
             src_label = src_label.replace(".jpg", ".txt")
             
             #manip on dst
@@ -141,8 +141,8 @@ for action_name in action_names:
             dst = os.path.join(test_action_dir, f"{video_name}_{file}")
             
             #manip on src
-            src_label = src.replace("UCF-preprocessed", "UCF_action_labelled_roi")
-            src_label = src_label.replace("images", "predict/labels")
+            src_label = src.replace(f"{ucf_preprocessed_dir_img}", f"{ucf_action_labelled_roi_dir_label}")
+            src_label = src_label.replace("image", "predict/labels/image")
             src_label = src_label.replace(".jpg", ".txt")
             
             #manip on dst
@@ -161,8 +161,8 @@ for action_name in action_names:
             dst = os.path.join(val_action_dir, f"{video_name}_{file}")
             
             #manip on src
-            src_label = src.replace("UCF-preprocessed", "UCF_action_labelled_roi")
-            src_label = src_label.replace("images", "predict/labels")
+            src_label = src.replace(f"{ucf_preprocessed_dir_img}", f"{ucf_action_labelled_roi_dir_label}")
+            src_label = src_label.replace("image", "predict/labels/image")
             src_label = src_label.replace(".jpg", ".txt")
             
             #manip on dst
