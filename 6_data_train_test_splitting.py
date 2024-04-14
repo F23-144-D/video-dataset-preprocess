@@ -129,7 +129,9 @@ for action_name in action_names:
             dst_label = dst_label.replace(".jpg", ".txt")
             
             shutil.copy(src, dst)
-            shutil.copy(src_label, dst_label)
+            # ignore label file if source does not exist
+            if os.path.exists(src_label):
+                shutil.copy(src_label, dst_label)
             print(f"Copying IMAGE {src} to {dst}")
             print(f"Copying LABEL {src_label} to {dst_label}")
             
@@ -150,7 +152,8 @@ for action_name in action_names:
             dst_label = dst_label.replace(".jpg", ".txt")
             
             shutil.copy(src, dst)
-            shutil.copy(src_label, dst_label)
+            if os.path.exists(src_label):
+                shutil.copy(src_label, dst_label)
             print(f"Copying IMAGE {src} to {dst}")
             print(f"Copying LABEL {src_label} to {dst_label}")
         
@@ -170,7 +173,8 @@ for action_name in action_names:
             dst_label = dst_label.replace(".jpg", ".txt")
             
             shutil.copy(src, dst)
-            shutil.copy(src_label, dst_label)
+            if os.path.exists(src_label):
+                shutil.copy(src_label, dst_label)
             print(f"Copying IMAGE {src} to {dst}")
             print(f"Copying LABEL {src_label} to {dst_label}")
 
