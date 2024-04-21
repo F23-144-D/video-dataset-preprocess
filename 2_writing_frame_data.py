@@ -1,7 +1,8 @@
 from __future__ import print_function, division
 import os
 
-dir_path = './Dataset/UCF101_n_frames'
+# dir_path = './Dataset/UCF101_n_frames'
+from variables import n_frames as dir_path
 
 for class_name in os.listdir(dir_path):
     class_path = os.path.join(dir_path, class_name)

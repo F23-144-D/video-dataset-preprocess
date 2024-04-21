@@ -170,11 +170,36 @@ for action_name in os.listdir(input_dir):
             action_id = actions[action_name]
             for i in range(len(lines)):
                 class_id, *rest = lines[i].split()
+<<<<<<<< Updated upstream:5_action_labelling.py
                 lines[i] = f"{action_id} {' '.join(rest)}\n"  # Append newline character
+========
+                lines[i] = f"{action_id} {' '.join(rest)}"
+>>>>>>>> Stashed changes:5_action_labelling_roi_processing.py
                 print(f"Line {i} after action labelling: ", lines[i])
                 
             print("-----------------------------------------------------------------------")
 
+<<<<<<<< Updated upstream:5_action_labelling.py
+========
+            # bboxes = [(float(bbox.split()[1]), float(bbox.split()[2]), float(bbox.split()[3]), float(bbox.split()[4])) for bbox in lines]
+            # # print("Original bboxes: ", bboxes)
+
+            # if APPLY_ROI:
+            #     roi_bboxes = calculate_roi(bboxes)
+            #     padded_bboxes = add_padding(roi_bboxes)
+            # else:
+            #     padded_bboxes = add_padding(bboxes)
+            
+            # # print("Processed bboxes: ", padded_bboxes)
+
+            # # Convert the padded bounding boxes back to lines
+            # for i in range(len(lines)):
+            #     _, bbox1, bbox2, bbox3, bbox4, *rest = lines[i].split()
+            #     lines[i] = f"{action_id} {padded_bboxes[i][0]} {padded_bboxes[i][1]} {padded_bboxes[i][2]} {padded_bboxes[i][3]} {' '.join(rest)}"
+            #     print(f"Line {i} after modding: ", lines[i])
+            # # mod_lines = [f"{action_id} {bbox[0]} {bbox[1]} {bbox[2]} {bbox[3]}\n" for bbox in padded_bboxes]
+            
+>>>>>>>> Stashed changes:5_action_labelling_roi_processing.py
             print("#####################################################################")
             print("")
             print("")

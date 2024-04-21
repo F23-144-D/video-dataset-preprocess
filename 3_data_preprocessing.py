@@ -8,15 +8,21 @@ from torch.utils.data import Dataset, DataLoader
 import torch
 
 
-root_dir = './'
-root_list = root_dir + 'Dataset/UCF101_n_frames/'
-info_list = root_dir + 'all_videos.txt'
-save_dir = root_dir + 'Dataset/UCF-preprocessed'
-class_dir = root_dir + 'classInd.txt'
+# root_dir = './'
+# root_list = root_dir + 'Dataset/UCF101_n_frames/'
+# info_list = root_dir + 'all_videos.txt'
+# save_dir = root_dir + 'Dataset/UCF-preprocessed'
+# class_dir = root_dir + 'classInd.txt'
 
-#frames per video
-CLIP_LENGTH = 8
+# #frames per video
+# CLIP_LENGTH = 8
 
+from variables import n_frames as root_list
+from variables import video_list as info_list
+from variables import processed_data as save_dir
+from variables import class_list as class_dir
+
+from variables import CLIP_LENGTH
 
 class ClipSubstractMean(object):
     def __init__(self, b=104, g=117, r=123):

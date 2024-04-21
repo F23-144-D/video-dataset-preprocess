@@ -1,6 +1,6 @@
-train: "./Dataset/train-data/train"
-test: "./Dataset/train-data/test"
-val: "./Dataset/train-data/val"
+train: "./Dataset/train-data/images/train"
+test: "./Dataset/train-data/images/test"
+val: "./Dataset/train-data/images/val"
 
 # Keypoints
 kpt_shape: [17, 3]  # number of keypoints, number of dims (2 for x,y or 3 for x,y,visible)

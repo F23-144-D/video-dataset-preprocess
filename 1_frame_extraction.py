@@ -1,13 +1,9 @@
 import os
 import subprocess
 
-#frames per second to extract
-FPS_RATE = 1
-
-#paths
-dir_path = 'Dataset/UCF-101/'
-dst_dir_path = 'Dataset/UCF101_n_frames'
-
+from variables import FPS_RATE
+from variables import raw_data as dir_path
+from variables import n_frames as dst_dir_path
 
 for class_name in os.listdir(dir_path):
     class_path = os.path.join(dir_path, class_name)
